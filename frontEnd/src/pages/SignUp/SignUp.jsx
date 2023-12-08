@@ -55,7 +55,7 @@ function SignUp() {
         uid: userCredential?.uid
       })
     }
-  }, [userCredential, errorInfoAdded])
+  }, [userCredential])
 
   useEffect(() => {
     if (confirmationInfoAdded) {
@@ -63,7 +63,8 @@ function SignUp() {
     } else {
       console.log(errorInfoAdded)
     }
-  }, [confirmationInfoAdded])
+  }, [confirmationInfoAdded, errorInfoAdded])
+
   return (
     <Main>
       <div className='sm:w-3/5 sm:h-4/5 w-[90%] bg-white rounded-3xl shadow-green-950 shadow-xl flex justify-center text-[#37E23B]'>
