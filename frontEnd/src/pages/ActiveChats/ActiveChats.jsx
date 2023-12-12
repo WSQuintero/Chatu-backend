@@ -82,8 +82,8 @@ function ActiveChats() {
     if (inputSearch !== '') {
       const filterMessages = actualUser.friends.filter((message) => {
         return (
-          message.name.includes(String(inputSearch.toLowerCase())) ||
-          message.messages.includes(String(inputSearch.toLowerCase()))
+          message.name.includes(String(inputSearch.toLowerCase())) 
+          //agregar despues la lógica para buscar por mensaje
         )
       })
       setFilterInput(filterMessages)
