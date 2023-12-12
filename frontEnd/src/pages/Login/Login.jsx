@@ -5,6 +5,7 @@ import { addUser } from '../../redux/userSlice'
 import { useNavigate } from 'react-router'
 import { useAccessUser } from '../../customHooks/useAccessUser'
 import { useReadUserInDb } from '../../customHooks/useReadUserInDb'
+import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
 import './Login.css'
 
 function Login() {
@@ -14,12 +15,14 @@ function Login() {
   const [error, SetError] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { findUser, userFinded } = useSearchUserByEmail()
 
   const handleLogin = (event) => {
     event.preventDefault()
     const loginEmail = event.target.elements.loginEmail.value
     const loginPassword = event.target.elements.loginPassword.value
     startAccessUser(loginEmail, loginPassword)
+    findUser(loginEmail)
   }
 
   useEffect(() => {
@@ -42,11 +45,31 @@ function Login() {
       dispatch(
         addUser({
           name: findedUser?.name.stringValue,
-          userName: findedUser?.name.stringValue,
-          userEmail: findedUser?.email.stringValue
+          email: findedUser?.email.stringValue
         })
       )
-      navigate('/chat')
+
+      sessionStorage.setItem(
+        'actualUser',
+        JSON.stringify({
+          name: findedUser?.name.stringValue,
+          email: findedUser?.email.stringValue,
+          uid: findedUser?.uid.stringValue,
+          friends: findedUser?.friends.arrayValue.values.map((friend) => {
+            return {
+              name: friend.mapValue.fields.name.stringValue,
+              email: friend.mapValue.fields.email.stringValue,
+              uid: friend.mapValue.fields.uid.stringValue
+            }
+          })
+        })
+      )
+      if(window.innerWidth<800){
+
+        navigate('/chat')
+      }else{
+        navigate("chat-desktop")
+      }
     }
   }, [findedUser])
 

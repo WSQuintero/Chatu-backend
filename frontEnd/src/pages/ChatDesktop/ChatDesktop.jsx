@@ -1,12 +1,12 @@
-import { ActiveChats } from '../../components/ActiveChats/ActiveChats'
 import { Main } from '../../components/Main/Main'
+import { ActiveChats } from '../ActiveChats/ActiveChats'
 import { Chat } from '../Chat/Chat'
 
 function ChatDesktop() {
   return (
     <Main>
       <div className='flex w-[90%]'>
-        <ActiveChats />
+        <ActiveChats/>
         <Chat />
       </div>
     </Main>

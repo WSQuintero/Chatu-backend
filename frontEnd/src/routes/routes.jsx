@@ -1,9 +1,9 @@
 import { Login } from '../pages/Login/Login'
 import { SignUp } from '../pages/SignUp/SignUp'
-import { ActiveChats } from '../components/ActiveChats/ActiveChats'
 import { Chat } from '../pages/Chat/Chat'
 import { createBrowserRouter } from 'react-router-dom'
 import ChatDesktop from '../pages/ChatDesktop/ChatDesktop'
+import { ActiveChats } from '../pages/ActiveChats/ActiveChats'
 
 export const router = createBrowserRouter([
   {

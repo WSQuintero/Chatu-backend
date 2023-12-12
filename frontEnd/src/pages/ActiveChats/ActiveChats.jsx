@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { setFriend } from '../../redux/friendChatSlice'
 
-
 function ActiveChats() {
   const dispatch = useDispatch()
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
@@ -26,15 +25,13 @@ function ActiveChats() {
   const [friendNoExist, setFriendNoExist] = useState(false)
   const navigate = useNavigate()
 
-
   const handleGoToChat = (event) => {
     if (window.innerWidth < 800) {
       navigate('/chat')
     } else {
       //pendiente configurar chat directo
     }
-      dispatch(setFriend())
-
+    dispatch(setFriend())
   }
   const handleSearchFriend = (event) => {
     event.preventDefault()
