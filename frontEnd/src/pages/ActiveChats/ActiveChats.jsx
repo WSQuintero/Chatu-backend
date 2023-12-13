@@ -12,11 +12,11 @@ import { useDispatch } from 'react-redux'
 import { setFriend } from '../../redux/friendChatSlice'
 import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
 import { socket } from '../../socket/socket'
+import { openModalChat } from '../../redux/openChatSlice'
 
 function ActiveChats() {
   const { updateDocument: updateUser, isOkayUpdate: updateUserOk } =
     useUpdateInformationUser()
-
   const dispatch = useDispatch()
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
   const { getDocumentId, actualIdOfCollection } = useGetIdOfCollection()
@@ -32,14 +32,8 @@ function ActiveChats() {
   const navigate = useNavigate()
 
   const handleGoToChat = (event) => {
-    if (window.innerWidth < 800) {
-      navigate('/chat')
-    } else {
-      const userEmail = event.target.dataset.email
-      find(userEmail)
-      // Ahora, la emisión del evento 'join' se realiza después de confirmar que el usuario está en la sala
-    }
-    console.log(event.target.dataset.email)
+    const userEmail = event.target.dataset.email
+    find(userEmail)
   }
   useEffect(() => {
     if (finded?.id) {
@@ -72,13 +66,22 @@ function ActiveChats() {
           console.log(
             `Usuario unido exitosamente a la sala: ${updatedUser.idConnection}`
           )
+          if (window.innerWidth < 800) {
+            navigate('/chat')
+          } else {
+            // Ahora, la emisión del evento 'join' se realiza después de confirmar que el usuario está en la sala
+            dispatch(openModalChat(true))
+          }
         } else {
           console.error(`Error al unirse a la sala: ${response.error}`)
         }
       })
 
       // Emitir el evento 'join' después de escuchar la respuesta del servidor
-      socket.emit('join', { id: updatedUser?.idConnection, sender: actualUser.email })
+      socket.emit('join', {
+        id: updatedUser?.idConnection,
+        sender: actualUser.email
+      })
 
       updateUser({
         nameOfColection: 'users',

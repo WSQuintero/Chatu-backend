@@ -66,7 +66,7 @@ function Login() {
       )
       if(window.innerWidth<800){
 
-        navigate('/chat')
+        navigate('/active-chats')
       }else{
         navigate("/chat-desktop")
       }
