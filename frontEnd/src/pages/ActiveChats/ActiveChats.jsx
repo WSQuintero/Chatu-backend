@@ -13,10 +13,12 @@ import { setFriend } from '../../redux/friendChatSlice'
 import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
 import { socket } from '../../socket/socket'
 import { openModalChat } from '../../redux/openChatSlice'
+import { updateFriendInformation } from '../../redux/friendInformationSlice'
 
 function ActiveChats() {
   const { updateDocument: updateUser, isOkayUpdate: updateUserOk } =
     useUpdateInformationUser()
+
   const dispatch = useDispatch()
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
   const { getDocumentId, actualIdOfCollection } = useGetIdOfCollection()
@@ -35,8 +37,12 @@ function ActiveChats() {
     const userEmail = event.target.dataset.email
     find(userEmail)
   }
+
   useEffect(() => {
     if (finded?.id) {
+      dispatch(
+        updateFriendInformation(finded?._document?.data.value.mapValue.fields)
+      )
       const updatedUser = {
         idConnection: [
           finded?._document?.data.value.mapValue.fields.uid.stringValue,
@@ -88,6 +94,7 @@ function ActiveChats() {
         idDocument: finded?.id,
         newInformation: updatedUser
       })
+      
     }
   }, [finded])
 
