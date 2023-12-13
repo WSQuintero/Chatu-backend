@@ -18,10 +18,6 @@ function Chat() {
 
   useEffect(() => {
     findUser(actualUser.email)
-  }, [])
-
-  console.log()
-  useEffect(() => {
     const receiveMessage = (message) => {
       setMessages((prev) => {
         return [
@@ -29,16 +25,51 @@ function Chat() {
           {
             message: message.message,
             user:
-              message.sender === actualUser.email
+              message.sender === actualUser?.email
                 ? actualUser.name
-                : friendInformation?.friend?.name?.stringValue
+                : friendInformation?.friend?.name?.stringValue,
+            sender: message.sender
           }
         ]
       })
     }
 
     socket.on('message', receiveMessage)
+  }, [])
+
+  useEffect(() => {
     if (userFinded) {
+      console.log()
+      const updatedInformation = (information) =>
+        information?._document?.data.value.mapValue.fields
+      console.log()
+      if (
+        updatedInformation(userFinded)?.messages?.arrayValue.values !==
+        undefined
+      ) {
+        setMessages(
+          updatedInformation(userFinded)?.messages?.arrayValue?.values.map(
+            (a) => {
+              return {
+                message: a?.mapValue.fields.message.stringValue,
+                sender: a?.mapValue.fields.sender.stringValue,
+                user: a?.mapValue.fields.user.stringValue
+              }
+            }
+          )
+        )
+      } else {
+        setMessages([])
+      }
+    }
+  }, [userFinded])
+  useEffect(() => {
+    if (userFinded) {
+      /*.map((a)=>{return {
+        message: a.mapValue.fields.message.stringValue,
+        sender: a.mapValue.fields.sender.stringValue,
+        user: a.mapValue.fields.user.stringValue
+      }})||[]*/
       const updatedInformation = (information) =>
         information._document.data.value.mapValue.fields
       updateDocument({
@@ -64,7 +95,7 @@ function Chat() {
         }
       })
     }
-  }, [])
+  }, [messages])
 
   const handleSubmit = (event) => {
     event.preventDefault()
