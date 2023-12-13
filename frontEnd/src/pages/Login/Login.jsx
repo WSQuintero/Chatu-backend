@@ -55,20 +55,20 @@ function Login() {
           name: findedUser?.name.stringValue,
           email: findedUser?.email.stringValue,
           uid: findedUser?.uid.stringValue,
-          friends: findedUser?.friends.arrayValue.values.map((friend) => {
+          friends: findedUser?.friends?.arrayValue?.values?.map((friend) => {
             return {
               name: friend.mapValue.fields.name.stringValue,
               email: friend.mapValue.fields.email.stringValue,
               uid: friend.mapValue.fields.uid.stringValue
             }
-          })
+          })||[]
         })
       )
       if(window.innerWidth<800){
 
         navigate('/chat')
       }else{
-        navigate("chat-desktop")
+        navigate("/chat-desktop")
       }
     }
   }, [findedUser])
