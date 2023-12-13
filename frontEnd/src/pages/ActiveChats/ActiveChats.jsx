@@ -10,9 +10,13 @@ import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { setFriend } from '../../redux/friendChatSlice'
-
+import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
+import { socket } from '../../socket/socket'
+import { openModalChat } from '../../redux/openChatSlice'
 
 function ActiveChats() {
+  const { updateDocument: updateUser, isOkayUpdate: updateUserOk } =
+    useUpdateInformationUser()
   const dispatch = useDispatch()
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
   const { getDocumentId, actualIdOfCollection } = useGetIdOfCollection()
@@ -22,25 +26,77 @@ function ActiveChats() {
   const [filterInput, setFilterInput] = useState([])
   const [withoutResults, setWithoutResults] = useState(false)
   const { findUser, userFinded } = useSearchUserByEmail()
+  const { findUser: find, userFinded: finded } = useSearchIdByEmail()
   const actualUser = JSON.parse(sessionStorage.getItem('actualUser'))
   const [friendNoExist, setFriendNoExist] = useState(false)
   const navigate = useNavigate()
 
-
   const handleGoToChat = (event) => {
-    if (window.innerWidth < 800) {
-      navigate('/chat')
-    } else {
-      //pendiente configurar chat directo
-    }
-      dispatch(setFriend())
-
+    const userEmail = event.target.dataset.email
+    find(userEmail)
   }
+  useEffect(() => {
+    if (finded?.id) {
+      const updatedUser = {
+        idConnection: [
+          finded?._document?.data.value.mapValue.fields.uid.stringValue,
+          actualUser.uid
+        ]
+          .sort()
+          .join(''),
+
+        name: finded?._document?.data.value.mapValue.fields.name.stringValue,
+        email: finded?._document?.data.value.mapValue.fields.email.stringValue,
+        uid: finded?._document?.data.value.mapValue.fields.uid.stringValue,
+        friends:
+          finded?._document?.data.value.mapValue.fields.friends.arrayValue?.values.map(
+            (f) => {
+              return {
+                name: f.mapValue.fields.name.stringValue,
+                email: f.mapValue.fields.email.stringValue,
+                uid: f.mapValue.fields.uid.stringValue
+              }
+            }
+          ) || []
+      }
+
+      // Ahora escuchamos la respuesta del servidor antes de emitir el evento 'join'
+      socket.on('joinResponse', (response) => {
+        if (response.success) {
+          console.log(
+            `Usuario unido exitosamente a la sala: ${updatedUser.idConnection}`
+          )
+          if (window.innerWidth < 800) {
+            navigate('/chat')
+          } else {
+            // Ahora, la emisión del evento 'join' se realiza después de confirmar que el usuario está en la sala
+            dispatch(openModalChat(true))
+          }
+        } else {
+          console.error(`Error al unirse a la sala: ${response.error}`)
+        }
+      })
+
+      // Emitir el evento 'join' después de escuchar la respuesta del servidor
+      socket.emit('join', {
+        id: updatedUser?.idConnection,
+        sender: actualUser.email
+      })
+
+      updateUser({
+        nameOfColection: 'users',
+        idDocument: finded?.id,
+        newInformation: updatedUser
+      })
+    }
+  }, [finded])
+
   const handleSearchFriend = (event) => {
     event.preventDefault()
     const searchUserByEmail = event.target.elements.searchUserByEmail.value
     findUser(searchUserByEmail)
   }
+
   const handleAddFriend = () => {
     setOpenModalSearchFriends(true)
   }
@@ -54,8 +110,9 @@ function ActiveChats() {
           uid: userFinded.uid.stringValue
         }
       ]
+
       if (
-        actualUser.friends.some(
+        actualUser?.friends?.some(
           (user) => user.email === userFinded.email.stringValue
         )
       ) {
@@ -71,6 +128,10 @@ function ActiveChats() {
             ...actualUser,
             friends: updatedUser,
             messages: []
+            // receivedMessages: [
+            //   ...finded?._document?.data.value.mapValue.fields?.receivedMessages
+            //     ?.arrayValue
+            // ]||[]
           }
         })
         sessionStorage.setItem(
@@ -84,10 +145,8 @@ function ActiveChats() {
   useEffect(() => {
     if (inputSearch !== '') {
       const filterMessages = actualUser.friends.filter((message) => {
-        return (
-          message.name.includes(String(inputSearch.toLowerCase())) ||
-          message.messages.includes(String(inputSearch.toLowerCase()))
-        )
+        return message.name.includes(String(inputSearch.toLowerCase()))
+        //agregar despues la lógica para buscar por mensaje
       })
       setFilterInput(filterMessages)
 
@@ -103,13 +162,12 @@ function ActiveChats() {
     getDocumentId('users')
   }, [])
 
-  useEffect(() => {}, [actualIdOfCollection])
-
   useEffect(() => {
     setTimeout(() => {
       setIsOkayUpdate(false)
     }, 2000)
   }, [isOkayUpdate])
+
   return (
     <Main>
       <figure className='w-[100px] h-[100px] p-2 absolute top-1 bg-white rounded-full'>

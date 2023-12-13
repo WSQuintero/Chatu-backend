@@ -7,9 +7,18 @@ const server = http.createServer(app)
 const io = new SocketServer(server)
 
 io.on('connection', (socket) => {
-  console.log('Client connected')
+  socket.on('join', (dataId) => {
+    socket.join(dataId.id)
+    socket.room = dataId.id
+    socket.sender = dataId.sender
+    console.log(`usuario conectado a sala ${dataId.sender}`)
+    socket.emit('joinResponse', {
+      success: true,
+      message: 'Successfully joined the room'
+    })
+  })
   socket.on('message', (data) => {
-    socket.broadcast.emit('message', data)
+    io.to(socket.room).emit('message', { message: data, sender: socket.sender })
   })
 })
 server.listen(4000)

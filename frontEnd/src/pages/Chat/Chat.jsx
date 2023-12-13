@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import io from 'socket.io-client'
 import { Main } from '../../components/Main/Main'
 import { LuSend } from 'react-icons/lu'
 import { IconContext } from 'react-icons/lib'
 import { useSelector } from 'react-redux'
-const socket = io('/')
+import { socket } from '../../socket/socket'
+const actualUser = JSON.parse(sessionStorage.getItem('actualUser'))
 
 function Chat() {
   const user = useSelector((state) => state.user)
@@ -13,16 +13,26 @@ function Chat() {
 
   useEffect(() => {
     socket.on('message', (message) => {
-      setMessages([...messages, { message, user: 'other' }])
+      console.log(message.message)
+      console.log(message.sender)
+      if (message.sender === actualUser.email) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { message: message.message, user: 'me' }
+        ])
+      } else {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { message: message.message, user: 'other' }
+        ])
+      }
     })
-  }, [messages])
+  }, [])
 
   const handleSubmit = (event) => {
     event.preventDefault()
     const message = event.target.elements.message.value
     socket.emit('message', message)
-    setMessages([...messages, { message: message, user: 'me' }])
-
     event.target.elements.message.value = ''
   }
   return (

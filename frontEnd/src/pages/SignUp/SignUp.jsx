@@ -52,7 +52,10 @@ function SignUp() {
     if (userCredential?.accessToken) {
       sendInformationUser({
         ...userInformation,
-        uid: userCredential?.uid
+        uid: userCredential?.uid,
+        friends: [],
+        messages: [],
+        idConnection: []
       })
     }
   }, [userCredential])
