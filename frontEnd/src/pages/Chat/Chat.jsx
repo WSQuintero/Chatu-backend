@@ -23,16 +23,18 @@ function Chat() {
   console.log()
   useEffect(() => {
     const receiveMessage = (message) => {
-      setMessages([
-        ...messages,
-        {
-          message: message.message,
-          user:
-            message.sender === actualUser.email
-              ? actualUser.name
-              : friendInformation?.friend?.name?.stringValue
-        }
-      ])
+      setMessages((prev) => {
+        return [
+          ...prev,
+          {
+            message: message.message,
+            user:
+              message.sender === actualUser.email
+                ? actualUser.name
+                : friendInformation?.friend?.name?.stringValue
+          }
+        ]
+      })
     }
 
     socket.on('message', receiveMessage)
@@ -81,10 +83,7 @@ function Chat() {
                 <p className=' break-all bg-[#D7FFD7] w-auto px-5 rounded-bl-2xl'>
                   {message.message}
                 </p>
-                <span className='break-all w-1/5 '>
-                  {' '}
-                  {user.name}:{message.user}
-                </span>
+                <span className='break-all w-1/5 '> {actualUser.name}</span>
               </li>
             ) : (
               <li
