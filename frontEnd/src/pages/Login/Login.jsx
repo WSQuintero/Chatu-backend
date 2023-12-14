@@ -15,7 +15,7 @@ function Login() {
   const [error, SetError] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { findUser, userFinded } = useSearchUserByEmail()
+  const { findUser, userFound } = useSearchUserByEmail()
 
   const handleLogin = (event) => {
     event.preventDefault()
@@ -42,33 +42,27 @@ function Login() {
 
   useEffect(() => {
     if (foundUser) {
-      dispatch(
-        addUser({
-          name: foundUser?.name.stringValue,
-          email: foundUser?.email.stringValue
-        })
-      )
-
-      sessionStorage.setItem(
-        'actualUser',
-        JSON.stringify({
+      const friendsOfFriend =
+      foundUser?.friends?.arrayValue?.values?.map((friend) => {
+        return {
+          name: friend.mapValue.fields.name.stringValue,
+          email: friend.mapValue.fields.email.stringValue,
+          uid: friend.mapValue.fields.uid.stringValue
+        }
+        }) || []
+        
+        const updatedUser = {
           name: foundUser?.name.stringValue,
           email: foundUser?.email.stringValue,
           uid: foundUser?.uid.stringValue,
-          friends: foundUser?.friends?.arrayValue?.values?.map((friend) => {
-            return {
-              name: friend.mapValue.fields.name.stringValue,
-              email: friend.mapValue.fields.email.stringValue,
-              uid: friend.mapValue.fields.uid.stringValue
-            }
-          })||[]
-        })
-      )
-      if(window.innerWidth<800){
-
+          friends: friendsOfFriend
+        }
+        sessionStorage.setItem('currentUser', JSON.stringify(updatedUser))
+        dispatch(addUser(updatedUser))
+      if (window.innerWidth < 800) {
         navigate('/active-chats')
-      }else{
-        navigate("/chat-desktop")
+      } else {
+        navigate('/chat-desktop')
       }
     }
   }, [foundUser])

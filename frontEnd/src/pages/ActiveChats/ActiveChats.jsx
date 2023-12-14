@@ -1,106 +1,95 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
-import { Main } from '../../components/Main/Main'
 import { IconContext } from 'react-icons/lib'
 import { IoIosAddCircle } from 'react-icons/io'
 import { useUpdateInformationUser } from '../../customHooks/useUpdateInformationUser'
 import { useGetIdOfCollection } from '../../customHooks/useGetIdOfCollection'
-import { IoIosCloseCircle } from 'react-icons/io'
 import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
-import { useNavigate } from 'react-router'
-import { useDispatch } from 'react-redux'
-import { setFriend } from '../../redux/friendChatSlice'
 import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
+import { IoIosCloseCircle } from 'react-icons/io'
 import { socket } from '../../socket/socket'
+import { useNavigate } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
 import { openModalChat } from '../../redux/openChatSlice'
 import { updateFriendInformation } from '../../redux/friendInformationSlice'
+import { Main } from '../../components/Main/Main'
+import { addUser } from '../../redux/userSlice'
 
 function ActiveChats() {
-  const { updateDocument: updateUser, isOkayUpdate: updateUserOk } =
-    useUpdateInformationUser()
-
+  const { updateDocument: updateUser } = useUpdateInformationUser()
+  const { actualIdOfCollection } = useGetIdOfCollection()
+  const { updateDocument, isOkayUpdate } = useUpdateInformationUser()
+  const { findUser: find, userFound: found } = useSearchIdByEmail()
+  const { findUser, userFound } = useSearchUserByEmail()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
+
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
-  const { getDocumentId, actualIdOfCollection } = useGetIdOfCollection()
-  const { updateDocument, isOkayUpdate, setIsOkayUpdate } =
-    useUpdateInformationUser()
   const [inputSearch, setInputSearch] = useState('')
   const [filterInput, setFilterInput] = useState([])
-  const [withoutResults, setWithoutResults] = useState(false)
-  const { findUser, userFinded } = useSearchUserByEmail()
-  const { findUser: find, userFinded: finded } = useSearchIdByEmail()
-  const actualUser = JSON.parse(sessionStorage.getItem('actualUser'))
   const [friendNoExist, setFriendNoExist] = useState(false)
-  const navigate = useNavigate()
+  const [withoutResults, setWithoutResults] = useState(false)
+
+  const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
 
   const handleGoToChat = (event) => {
     const userEmail = event.target.dataset.email
     find(userEmail)
   }
 
-  useEffect(() => {
-    if (finded?.id) {
-      dispatch(
-        updateFriendInformation(finded?._document?.data.value.mapValue.fields)
-      )
-      const updatedUser = {
-        idConnection: [
-          finded?._document?.data.value.mapValue.fields.uid.stringValue,
-          actualUser.uid
-        ]
-          .sort()
-          .join(''),
-
-        name: finded?._document?.data.value.mapValue.fields.name.stringValue,
-        email: finded?._document?.data.value.mapValue.fields.email.stringValue,
-        uid: finded?._document?.data.value.mapValue.fields.uid.stringValue,
-        friends:
-          finded?._document?.data.value.mapValue.fields.friends.arrayValue?.values.map(
-            (f) => {
-              return {
-                name: f.mapValue.fields.name.stringValue,
-                email: f.mapValue.fields.email.stringValue,
-                uid: f.mapValue.fields.uid.stringValue
-              }
-            }
-          ) || []
-      }
-
-      // Ahora escuchamos la respuesta del servidor antes de emitir el evento 'join'
-      socket.on('joinResponse', (response) => {
-        if (response.success) {
-          console.log(
-            `Usuario unido exitosamente a la sala: ${updatedUser.idConnection}`
-          )
-          if (window.innerWidth < 800) {
-            navigate('/chat')
-          } else {
-            // Ahora, la emisión del evento 'join' se realiza después de confirmar que el usuario está en la sala
-            dispatch(openModalChat(true))
-          }
+  const connectToRoom = (idConnection) => {
+    socket.on('joinResponse', (response) => {
+      if (response.success) {
+        console.log(`Usuario unido exitosamente a la sala: ${idConnection}`)
+        if (window.innerWidth < 800) {
+          navigate('/chat')
         } else {
-          console.error(`Error al unirse a la sala: ${response.error}`)
+          dispatch(openModalChat(true))
         }
-      })
+      } else {
+        console.error(`Error al unirse a la sala: ${response.error}`)
+      }
+    })
 
-      // Emitir el evento 'join' después de escuchar la respuesta del servidor
-      socket.emit('join', {
-        id: updatedUser?.idConnection,
-        sender: actualUser.email
-      })
+    socket.emit('join', {
+      id: idConnection,
+      sender: currentUser.email
+    })
+  }
+  const updateUserInDb = (friendInformation, idConnection) => {
+    if (found?.id) {
+      dispatch(updateFriendInformation(friendInformation))
+
+      const friendsOfFriend =
+        friendInformation.friends.arrayValue?.values.map((f) => {
+          return {
+            name: f.mapValue.fields.name.stringValue,
+            email: f.mapValue.fields.email.stringValue,
+            uid: f.mapValue.fields.uid.stringValue
+          }
+        }) || []
+
+      const updatedUser = {
+        idConnection,
+        name: friendInformation.name.stringValue,
+        email: friendInformation.email.stringValue,
+        uid: friendInformation.uid.stringValue,
+        friends: friendsOfFriend
+      }
 
       updateUser({
         nameOfCollection: 'users',
-        idDocument: finded?.id,
+        idDocument: found?.id,
         newInformation: updatedUser
       })
-      
+      dispatch(addUser(updatedUser))
     }
-  }, [finded])
+  }
 
   const handleSearchFriend = (event) => {
     event.preventDefault()
     const searchUserByEmail = event.target.elements.searchUserByEmail.value
+
     findUser(searchUserByEmail)
   }
 
@@ -109,49 +98,59 @@ function ActiveChats() {
   }
   const handleAddListOfFriends = () => {
     if (actualIdOfCollection) {
+      const userFriends = currentUser.friends
       const updatedUser = [
-        ...actualUser.friends,
+        ...userFriends,
         {
-          name: userFinded.name.stringValue,
-          email: userFinded.email.stringValue,
-          uid: userFinded.uid.stringValue
+          name: userFound.name.stringValue,
+          email: userFound.email.stringValue,
+          uid: userFound.uid.stringValue
         }
       ]
+      const friendFound = userFriends?.some(
+        (user) => user.email === userFound.email.stringValue
+      )
 
-      if (
-        actualUser?.friends?.some(
-          (user) => user.email === userFinded.email.stringValue
-        )
-      ) {
+      if (friendFound) {
         setFriendNoExist(true)
         setTimeout(() => {
           setFriendNoExist(false)
         }, 2000)
       } else {
+        const updatedFriends = JSON.stringify({
+          ...currentUser,
+          friends: updatedUser
+        })
         updateDocument({
           nameOfCollection: 'users',
           idDocument: actualIdOfCollection,
           newInformation: {
-            ...actualUser,
+            ...currentUser,
             friends: updatedUser,
             messages: []
-            // receivedMessages: [
-            //   ...finded?._document?.data.value.mapValue.fields?.receivedMessages
-            //     ?.arrayValue
-            // ]||[]
           }
         })
-        sessionStorage.setItem(
-          'actualUser',
-          JSON.stringify({ ...actualUser, friends: updatedUser })
-        )
+
+        sessionStorage.setItem('currentUser', updatedFriends)
       }
     }
   }
 
   useEffect(() => {
+    if (found?.id) {
+      const friendInformation = found?._document?.data.value.mapValue.fields
+      const friendUid = friendInformation.uid.stringValue
+      const idConnection = [friendUid, currentUser.uid].sort().join('')
+
+      updateUserInDb(friendInformation, idConnection)
+      connectToRoom(idConnection)
+    }
+  }, [found])
+
+  useEffect(() => {
     if (inputSearch !== '') {
-      const filterMessages = actualUser.friends.filter((message) => {
+      const userFriends = currentUser.friends
+      const filterMessages = userFriends.filter((message) => {
         return message.name.includes(String(inputSearch.toLowerCase()))
         //agregar despues la lógica para buscar por mensaje
       })
@@ -159,21 +158,14 @@ function ActiveChats() {
 
       if (filterMessages.length === 0) {
         setWithoutResults(true)
+        setTimeout(() => {
+          setWithoutResults(false)
+        }, 2000)
       } else {
         setWithoutResults(false)
       }
     }
   }, [inputSearch])
-
-  useEffect(() => {
-    getDocumentId('users')
-  }, [])
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsOkayUpdate(false)
-    }, 2000)
-  }, [isOkayUpdate])
 
   return (
     <Main>
@@ -197,7 +189,7 @@ function ActiveChats() {
           />
         </div>
         {inputSearch === ''
-          ? actualUser.friends.map((friend) => (
+          ? currentUser.friends.map((friend) => (
               <article
                 key={friend.uid}
                 className='h-[50px] flex border border-[#37E23B] text-xs items-center px-5 gap-5 hover:bg-[#D7FFD7] cursor-pointer'
@@ -219,8 +211,9 @@ function ActiveChats() {
           : filterInput.map((friend) => (
               <article
                 key={friend.uid}
-                className='h-[50px] flex border border-[#37E23B] text-xs items-center px-5 gap-5 hover:bg-[#D7FFD7]'
-                onClick={handleGoToChat}>
+                className='h-[50px] flex border border-[#37E23B] text-xs items-center px-5 gap-5 hover:bg-[#D7FFD7] cursor-pointer'
+                onClick={handleGoToChat}
+                data-email={friend.email}>
                 <img
                   src={friend?.img || '/img/no-user.jpg'}
                   alt='user image'
@@ -280,25 +273,25 @@ function ActiveChats() {
               Buscar
             </button>
           </form>
-          {userFinded && (
+          {userFound && (
             <div className='w-full p-5'>
               <article className='flex flex-col sm:flex-row justify-between  border border-[#37E23B] p-4 items-center'>
                 <div className='flex gap-3'>
                   <img
                     src={
-                      userFinded?.img?.stringValue
-                        ? userFinded?.img?.stringValue
+                      userFound?.img?.stringValue
+                        ? userFound?.img?.stringValue
                         : '/img/no-user.jpg'
                     }
-                    alt={userFinded.name.stringValue}
+                    alt={userFound.name.stringValue}
                     className='w-[60px] h-[60px] rounded-full border-4 border-[#37E23B'
                   />
                   <div>
                     <h3 className='text-[#19581a]'>
-                      {userFinded.name.stringValue}
+                      {userFound.name.stringValue}
                     </h3>
                     <p className='text-[#257726]'>
-                      {userFinded.email.stringValue}
+                      {userFound.email.stringValue}
                     </p>
                   </div>
                 </div>
@@ -311,12 +304,12 @@ function ActiveChats() {
               <div className='flex flex-col justify-center items-center'>
                 {isOkayUpdate && (
                   <p className='text-blue-600 mt-10 font-bold text-lg'>
-                    Has añadido a {userFinded?.name.stringValue} a tus amigos{' '}
+                    Has añadido a {userFound?.name.stringValue} a tus amigos{' '}
                   </p>
                 )}
                 {friendNoExist && (
                   <p className='text-red-600 mt-10 font-bold text-lg'>
-                    {userFinded?.name.stringValue} ya se encuentra en tus amigos{' '}
+                    {userFound?.name.stringValue} ya se encuentra en tus amigos{' '}
                   </p>
                 )}
               </div>

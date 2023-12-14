@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 function useGetIdOfCollection() {
   const [actualIdOfCollection, setActualIdOfCollection] = useState()
-  const actualUserInformation = JSON.parse(sessionStorage.getItem('actualUser'))
+  const currentUserInformation = JSON.parse(sessionStorage.getItem('currentUser'))
 
-  const getDocumentId = async (nameOfCollection) => {
-    const refCollection = collection(db, nameOfCollection)
+  const getDocumentId = async () => {
+    const refCollection = collection(db, "users")
 
     try {
       const querySnapshot = await getDocs(refCollection)
@@ -15,7 +15,7 @@ function useGetIdOfCollection() {
       const actualId = Array(...querySnapshot.docs).find((doc) => {
         const foundEmail =
           doc._document.data.value.mapValue.fields.email.stringValue
-        return actualUserInformation.email === foundEmail
+        return currentUserInformation.email === foundEmail
       })
 
       if (actualId?.id) {
@@ -28,7 +28,8 @@ function useGetIdOfCollection() {
       console.error('Error al obtener documentos de la colección:', error)
     }
   }
-  return { getDocumentId, actualIdOfCollection }
+  getDocumentId()
+  return {  actualIdOfCollection }
 }
 
 export { useGetIdOfCollection }

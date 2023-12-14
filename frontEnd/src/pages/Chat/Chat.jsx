@@ -6,18 +6,17 @@ import { useSelector } from 'react-redux'
 import { socket } from '../../socket/socket'
 import { useUpdateInformationUser } from '../../customHooks/useUpdateInformationUser'
 import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
-const actualUser = JSON.parse(sessionStorage.getItem('actualUser'))
+const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
 
 function Chat() {
-  const user = useSelector((state) => state.user)
   const friendInformation = useSelector((state) => state.friendInformation)
 
   const { updateDocument } = useUpdateInformationUser()
-  const { findUser, userFinded } = useSearchIdByEmail()
+  const { findUser, userFound } = useSearchIdByEmail()
   const [messages, setMessages] = useState([])
 
   useEffect(() => {
-    findUser(actualUser.email)
+    findUser(currentUser.email)
     const receiveMessage = (message) => {
       setMessages((prev) => {
         return [
@@ -25,8 +24,8 @@ function Chat() {
           {
             message: message.message,
             user:
-              message.sender === actualUser?.email
-                ? actualUser.name
+              message.sender === currentUser?.email
+                ? currentUser.name
                 : friendInformation?.friend?.name?.stringValue,
             sender: message.sender
           }
@@ -38,17 +37,16 @@ function Chat() {
   }, [])
 
   useEffect(() => {
-    if (userFinded) {
-      console.log()
+    if (userFound) {
+      console.log(userFound)
       const updatedInformation = (information) =>
         information?._document?.data.value.mapValue.fields
       console.log()
       if (
-        updatedInformation(userFinded)?.messages?.arrayValue.values !==
-        undefined
+        updatedInformation(userFound)?.messages?.arrayValue.values !== undefined
       ) {
         setMessages(
-          updatedInformation(userFinded)?.messages?.arrayValue?.values.map(
+          updatedInformation(userFound)?.messages?.arrayValue?.values.map(
             (a) => {
               return {
                 message: a?.mapValue.fields.message.stringValue,
@@ -62,24 +60,20 @@ function Chat() {
         setMessages([])
       }
     }
-  }, [userFinded])
+  }, [userFound])
+
   useEffect(() => {
-    if (userFinded) {
-      /*.map((a)=>{return {
-        message: a.mapValue.fields.message.stringValue,
-        sender: a.mapValue.fields.sender.stringValue,
-        user: a.mapValue.fields.user.stringValue
-      }})||[]*/
+    if (userFound) {
       const updatedInformation = (information) =>
         information._document.data.value.mapValue.fields
       updateDocument({
         nameOfCollection: 'users',
-        idDocument: userFinded.id,
+        idDocument: userFound.id,
         newInformation: {
-          email: updatedInformation(userFinded).email.stringValue,
-          name: updatedInformation(userFinded).name.stringValue,
+          email: updatedInformation(userFound).email.stringValue,
+          name: updatedInformation(userFound).name.stringValue,
           friends: [
-            ...updatedInformation(userFinded).friends.arrayValue.values.map(
+            ...updatedInformation(userFound).friends.arrayValue.values.map(
               (a) => {
                 return {
                   email: a.mapValue.fields.email.stringValue,
@@ -89,8 +83,8 @@ function Chat() {
               }
             )
           ],
-          idConnection: updatedInformation(userFinded).idConnection.stringValue,
-          uid: updatedInformation(userFinded).uid.stringValue,
+          idConnection: updatedInformation(userFound).idConnection.stringValue,
+          uid: updatedInformation(userFound).uid.stringValue,
           messages: messages
         }
       })
@@ -99,7 +93,6 @@ function Chat() {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-
     const message = event.target.elements.message.value
     socket.emit('message', message)
     event.target.elements.message.value = ''
@@ -108,25 +101,30 @@ function Chat() {
     <Main>
       <div className='flex flex-col w-[97%] px-10 gap-3 h-[99%] mt-20  bg-white  lg:rounded-tl-[100px] rounded-3xl overflow-auto  lg:rounded-br-[100px]  shadow-green-950 shadow-xl  justify-end text-[#37E23B]'>
         <ul className='h-11/12 pt-5 bg-white w-full gap-5 flex flex-col '>
-          {messages.map((message, index) =>
-            message.user === actualUser.name ? (
-              <li key={index} className='flex justify-end gap-2'>
-                <p className=' break-all bg-[#D7FFD7] w-auto px-5 rounded-bl-2xl'>
-                  {message.message}
-                </p>
-                <span className='break-all w-1/5 '> {actualUser.name}</span>
-              </li>
-            ) : (
-              <li
-                key={index}
-                className='flex justify-start gap-2 text-[#088AE1]'>
-                <span className='break-all'>{message.user}: </span>
-                <p className=' break-all bg-[#50EAFF]/40 w-auto px-5 rounded-br-2xl'>
-                  {message.message}
-                </p>
-              </li>
-            )
-          )}
+          {
+          // messages.some(
+          //   (message) =>
+          //     message.sender === friendInformation.friend.email.stringValue
+          // ) &&
+            messages.map((message, index) =>
+              message.user === currentUser.name ? (
+                <li key={index} className='flex justify-end gap-2'>
+                  <p className=' break-all bg-[#D7FFD7] w-auto px-5 rounded-bl-2xl'>
+                    {message.message}
+                  </p>
+                  <span className='break-all w-1/5 '> {currentUser.name}</span>
+                </li>
+              ) : (
+                <li
+                  key={index}
+                  className='flex justify-start gap-2 text-[#088AE1]'>
+                  <span className='break-all'>{message.user}: </span>
+                  <p className=' break-all bg-[#50EAFF]/40 w-auto px-5 rounded-br-2xl'>
+                    {message.message}
+                  </p>
+                </li>
+              )
+            )}
         </ul>
         <form
           onSubmit={handleSubmit}

@@ -14,6 +14,9 @@ function useUpdateInformationUser() {
     try {
       await updateDoc(docRef, newInformation)
       setIsOkayUpdate(true)
+      setTimeout(() => {
+        setIsOkayUpdate(false)
+      }, 2000)
     } catch (error) {
       console.error('Error al actualizar el documento:', error)
     }

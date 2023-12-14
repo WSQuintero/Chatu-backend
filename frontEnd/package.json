@@ -33,6 +33,7 @@
     "eslint-plugin-react-refresh": "^0.4.4",
     "firebase": "^10.7.1",
     "react-redux": "^9.0.2",
+    "terser-brunch": "^4.1.0",
     "vite": "^5.0.0"
   }
 }

@@ -6,12 +6,12 @@ function useReadUserInDb() {
   const [foundUser, setFoundUser] = useState(null)
   const readUserInDb = async (uid) => {
     const querySnapshot = await getDocs(collection(db, 'users'))
-    const actualUser = Array(...querySnapshot.docs).find((user) => {
+    const currentUser = Array(...querySnapshot.docs).find((user) => {
       const foundUid = user._document.data.value.mapValue.fields.uid.stringValue
 
       return String(foundUid) === String(uid)
     })
-    setFoundUser(actualUser._document.data.value.mapValue.fields)
+    setFoundUser(currentUser._document.data.value.mapValue.fields)
   }
   return { readUserInDb, foundUser }
 }
