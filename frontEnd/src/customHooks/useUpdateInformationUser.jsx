@@ -5,11 +5,11 @@ import { useState } from 'react'
 function useUpdateInformationUser() {
   const [isOkayUpdate, setIsOkayUpdate] = useState(false)
   const updateDocument = async ({
-    nameOfColection,
+    nameOfCollection,
     idDocument,
     newInformation
   }) => {
-    const docRef = doc(db, nameOfColection, idDocument)
+    const docRef = doc(db, nameOfCollection, idDocument)
 
     try {
       await updateDoc(docRef, newInformation)

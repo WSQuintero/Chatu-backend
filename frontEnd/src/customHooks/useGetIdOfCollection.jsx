@@ -13,10 +13,9 @@ function useGetIdOfCollection() {
       const querySnapshot = await getDocs(refCollection)
 
       const actualId = Array(...querySnapshot.docs).find((doc) => {
-        return (
-          actualUserInformation.email ===
+        const foundEmail =
           doc._document.data.value.mapValue.fields.email.stringValue
-        )
+        return actualUserInformation.email === foundEmail
       })
 
       if (actualId?.id) {

@@ -73,7 +73,7 @@ function Chat() {
       const updatedInformation = (information) =>
         information._document.data.value.mapValue.fields
       updateDocument({
-        nameOfColection: 'users',
+        nameOfCollection: 'users',
         idDocument: userFinded.id,
         newInformation: {
           email: updatedInformation(userFinded).email.stringValue,

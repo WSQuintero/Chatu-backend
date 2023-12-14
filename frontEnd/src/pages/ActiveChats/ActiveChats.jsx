@@ -90,7 +90,7 @@ function ActiveChats() {
       })
 
       updateUser({
-        nameOfColection: 'users',
+        nameOfCollection: 'users',
         idDocument: finded?.id,
         newInformation: updatedUser
       })
@@ -129,7 +129,7 @@ function ActiveChats() {
         }, 2000)
       } else {
         updateDocument({
-          nameOfColection: 'users',
+          nameOfCollection: 'users',
           idDocument: actualIdOfCollection,
           newInformation: {
             ...actualUser,

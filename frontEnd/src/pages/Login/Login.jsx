@@ -9,7 +9,7 @@ import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
 import './Login.css'
 
 function Login() {
-  const { readUserInDb, findedUser } = useReadUserInDb()
+  const { readUserInDb, foundUser } = useReadUserInDb()
   const { startAccessUser, userAuthenticated, errorUserAuthenticated } =
     useAccessUser()
   const [error, SetError] = useState('')
@@ -41,21 +41,21 @@ function Login() {
   }, [userAuthenticated, errorUserAuthenticated])
 
   useEffect(() => {
-    if (findedUser) {
+    if (foundUser) {
       dispatch(
         addUser({
-          name: findedUser?.name.stringValue,
-          email: findedUser?.email.stringValue
+          name: foundUser?.name.stringValue,
+          email: foundUser?.email.stringValue
         })
       )
 
       sessionStorage.setItem(
         'actualUser',
         JSON.stringify({
-          name: findedUser?.name.stringValue,
-          email: findedUser?.email.stringValue,
-          uid: findedUser?.uid.stringValue,
-          friends: findedUser?.friends?.arrayValue?.values?.map((friend) => {
+          name: foundUser?.name.stringValue,
+          email: foundUser?.email.stringValue,
+          uid: foundUser?.uid.stringValue,
+          friends: foundUser?.friends?.arrayValue?.values?.map((friend) => {
             return {
               name: friend.mapValue.fields.name.stringValue,
               email: friend.mapValue.fields.email.stringValue,
@@ -71,7 +71,7 @@ function Login() {
         navigate("/chat-desktop")
       }
     }
-  }, [findedUser])
+  }, [foundUser])
 
   return (
     <Main>

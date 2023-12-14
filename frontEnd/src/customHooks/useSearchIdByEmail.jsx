@@ -14,9 +14,9 @@ function useSearchIdByEmail() {
       const querySnapshot = await getDocs(refCollection)
 
       const userFinded = Array(...querySnapshot.docs).find((doc) => {
-        return (
-          email === doc._document.data.value.mapValue.fields.email.stringValue
-        )
+        const foundEmail =
+          doc._document.data.value.mapValue.fields.email.stringValue
+        return email === foundEmail
       })
 
       if (userFinded?.id) {
@@ -32,5 +32,4 @@ function useSearchIdByEmail() {
   return { findUser, userFinded }
 }
 
-
-export  {useSearchIdByEmail}
+export { useSearchIdByEmail }
