@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Main } from '../../components/Main/Main'
 import { LuSend } from 'react-icons/lu'
 import { IconContext } from 'react-icons/lib'
@@ -11,13 +11,29 @@ const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
 function Chat() {
   const friendInformation = useSelector((state) => state.friendInformation)
 
-  const { updateDocument } = useUpdateInformationUser()
-  const { findUser, userFound } = useSearchIdByEmail()
+  const { updateDocument: updateActualUserInformation } =
+    useUpdateInformationUser()
+  const { findUser: findActualUser, userFound: actualUserInformation } =
+    useSearchIdByEmail()
   const [messages, setMessages] = useState([])
+  const [groupOfMessages, setGroupOfMessages] = useState([])
 
+  /*EL siguiente useEffect contiene el evento asociado al servidor
+  que se encarga de recibir los mensajes llegados de este y actualizar el estado messages con esto */
   useEffect(() => {
-    findUser(currentUser.email)
+    findActualUser(currentUser.email)
     const receiveMessage = (message) => {
+      
+      const isUserOrFriend=message.sender === currentUser?.email
+            ? currentUser.name
+            : friendInformation?.friend?.name?.stringValue
+
+      const newMessages = {
+        message: message.message,
+        user: isUserOrFriend,
+        sender: message.sender
+      }
+      setGroupOfMessages((prev) => [...prev, newMessages])
       setMessages((prev) => {
         return [
           ...prev,
@@ -36,17 +52,22 @@ function Chat() {
     socket.on('message', receiveMessage)
   }, [])
 
+  // useEffect(() => {
+  //   console.log(groupOfMessages)
+  // }, [groupOfMessages])
+
+  /* El siguiente useEffect sirve para que en el momento en que se encuentra el usuario actual
+  se actualice el estado messages con dicha información */
   useEffect(() => {
-    if (userFound) {
-      console.log(userFound)
-      const updatedInformation = (information) =>
+    if (actualUserInformation) {
+      const actualUser = (information) =>
         information?._document?.data.value.mapValue.fields
-      console.log()
-      if (
-        updatedInformation(userFound)?.messages?.arrayValue.values !== undefined
-      ) {
+      const messagesInDbExist = actualUser(actualUserInformation)?.messages
+        ?.arrayValue.values
+
+      if (messagesInDbExist) {
         setMessages(
-          updatedInformation(userFound)?.messages?.arrayValue?.values.map(
+          actualUser(actualUserInformation)?.messages?.arrayValue?.values.map(
             (a) => {
               return {
                 message: a?.mapValue.fields.message.stringValue,
@@ -60,36 +81,42 @@ function Chat() {
         setMessages([])
       }
     }
-  }, [userFound])
+  }, [actualUserInformation])
 
+  //El siguiente useEffect sirve para actualizar la información en firestore
   useEffect(() => {
-    if (userFound) {
-      const updatedInformation = (information) =>
+    if (actualUserInformation) {
+      const actualUser = (information) =>
         information._document.data.value.mapValue.fields
-      updateDocument({
+      const actualUserIdConnection = actualUser(actualUserInformation)
+        .idConnection.stringValue
+      const actualUserFriends = actualUser(
+        actualUserInformation
+      ).friends.arrayValue.values.map((a) => {
+        return {
+          email: a.mapValue.fields.email.stringValue,
+          name: a.mapValue.fields.name.stringValue,
+          uid: a.mapValue.fields.uid.stringValue
+        }
+      })
+
+      updateActualUserInformation({
         nameOfCollection: 'users',
-        idDocument: userFound.id,
+        idDocument: actualUserInformation.id,
         newInformation: {
-          email: updatedInformation(userFound).email.stringValue,
-          name: updatedInformation(userFound).name.stringValue,
-          friends: [
-            ...updatedInformation(userFound).friends.arrayValue.values.map(
-              (a) => {
-                return {
-                  email: a.mapValue.fields.email.stringValue,
-                  name: a.mapValue.fields.name.stringValue,
-                  uid: a.mapValue.fields.uid.stringValue
-                }
-              }
-            )
-          ],
-          idConnection: updatedInformation(userFound).idConnection.stringValue,
-          uid: updatedInformation(userFound).uid.stringValue,
+          email: actualUser(actualUserInformation).email.stringValue,
+          name: actualUser(actualUserInformation).name.stringValue,
+          friends: [...actualUserFriends],
+          idConnection: actualUserIdConnection,
+          uid: actualUser(actualUserInformation).uid.stringValue,
           messages: messages
         }
       })
     }
   }, [messages])
+
+  /*La siguiente función es la relacionada con el boton de enviar
+   mensaje y sirve recibir y emitir al servidor el nuevo mensaje*/
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -97,15 +124,16 @@ function Chat() {
     socket.emit('message', message)
     event.target.elements.message.value = ''
   }
+
   return (
     <Main>
       <div className='flex flex-col w-[97%] px-10 gap-3 h-[99%] mt-20  bg-white  lg:rounded-tl-[100px] rounded-3xl overflow-auto  lg:rounded-br-[100px]  shadow-green-950 shadow-xl  justify-end text-[#37E23B]'>
         <ul className='h-11/12 pt-5 bg-white w-full gap-5 flex flex-col '>
           {
-          // messages.some(
-          //   (message) =>
-          //     message.sender === friendInformation.friend.email.stringValue
-          // ) &&
+            // messages.some(
+            //   (message) =>
+            //     message.sender === friendInformation.friend.email.stringValue
+            // ) &&
             messages.map((message, index) =>
               message.user === currentUser.name ? (
                 <li key={index} className='flex justify-end gap-2'>
@@ -124,7 +152,8 @@ function Chat() {
                   </p>
                 </li>
               )
-            )}
+            )
+          }
         </ul>
         <form
           onSubmit={handleSubmit}
