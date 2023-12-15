@@ -5,7 +5,7 @@ import { addUser } from '../../redux/userSlice'
 import { useNavigate } from 'react-router'
 import { useAccessUser } from '../../customHooks/useAccessUser'
 import { useReadUserInDb } from '../../customHooks/useReadUserInDb'
-import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
+import { updateActualUser, verifyAuthentication } from './helpersLogin'
 import './Login.css'
 
 function Login() {
@@ -15,56 +15,25 @@ function Login() {
   const [error, SetError] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { findUser, userFound } = useSearchUserByEmail()
 
   const handleLogin = (event) => {
     event.preventDefault()
     const loginEmail = event.target.elements.loginEmail.value
     const loginPassword = event.target.elements.loginPassword.value
     startAccessUser(loginEmail, loginPassword)
-    findUser(loginEmail)
   }
 
   useEffect(() => {
-    if (userAuthenticated?.accessToken) {
-      readUserInDb(userAuthenticated?.uid)
-    } else {
-      switch (errorUserAuthenticated.errorCode) {
-        case 'auth/invalid-credential':
-          SetError('El usuario o la contraseña son incorrectos')
-          setTimeout(() => {
-            SetError('')
-          }, 2000)
-          break
-      }
-    }
+    verifyAuthentication({
+      userAuthenticated,
+      SetError,
+      errorUserAuthenticated,
+      readUserInDb
+    })
   }, [userAuthenticated, errorUserAuthenticated])
 
   useEffect(() => {
-    if (foundUser) {
-      const friendsOfFriend =
-      foundUser?.friends?.arrayValue?.values?.map((friend) => {
-        return {
-          name: friend.mapValue.fields.name.stringValue,
-          email: friend.mapValue.fields.email.stringValue,
-          uid: friend.mapValue.fields.uid.stringValue
-        }
-        }) || []
-        
-        const updatedUser = {
-          name: foundUser?.name.stringValue,
-          email: foundUser?.email.stringValue,
-          uid: foundUser?.uid.stringValue,
-          friends: friendsOfFriend
-        }
-        sessionStorage.setItem('currentUser', JSON.stringify(updatedUser))
-        dispatch(addUser(updatedUser))
-      if (window.innerWidth < 800) {
-        navigate('/active-chats')
-      } else {
-        navigate('/chat-desktop')
-      }
-    }
+    updateActualUser({ foundUser, dispatch, navigate, addUser })
   }, [foundUser])
 
   return (
