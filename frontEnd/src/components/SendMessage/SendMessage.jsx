@@ -3,12 +3,14 @@ import { socket } from '../../socket/socket'
 import { IconContext } from 'react-icons/lib'
 
 function SendMessage() {
+
   const handleSubmit = (event) => {
     event.preventDefault()
     const message = event.target.elements.message.value
     socket.emit('message', message)
     event.target.elements.message.value = ''
   }
+  
   return (
     <form
       onSubmit={handleSubmit}

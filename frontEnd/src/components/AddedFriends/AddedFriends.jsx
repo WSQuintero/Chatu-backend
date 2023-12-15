@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 
 function AddedFriends({ inputSearch, findFriend }) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
@@ -25,7 +25,6 @@ function AddedFriends({ inputSearch, findFriend }) {
     }
   }, [inputSearch])
 
-  
   return (
     <>
       {inputSearch === ''
@@ -49,7 +48,7 @@ function AddedFriends({ inputSearch, findFriend }) {
             <article
               key={friend.uid}
               className='h-[50px] flex border border-[#37E23B] text-xs items-center px-5 gap-5 hover:bg-[#D7FFD7] cursor-pointer'
-              onClick={handleGoToChat}
+              onClick={(event) => findFriend(event.target.dataset.email)}
               data-email={friend.email}>
               <img
                 src={friend?.img || '/img/no-user.jpg'}
