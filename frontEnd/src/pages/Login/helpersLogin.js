@@ -1,6 +1,6 @@
 function updateActualUser({ foundUser, dispatch, navigate, addUser }) {
   if (foundUser) {
-    const friendsOfFriend =
+    const friends =
       foundUser?.friends?.arrayValue?.values?.map((friend) => {
         return {
           name: friend.mapValue.fields.name.stringValue,
@@ -13,7 +13,7 @@ function updateActualUser({ foundUser, dispatch, navigate, addUser }) {
       name: foundUser?.name.stringValue,
       email: foundUser?.email.stringValue,
       uid: foundUser?.uid.stringValue,
-      friends: friendsOfFriend
+      friends: friends
     }
     sessionStorage.setItem('currentUser', JSON.stringify(updatedUser))
     dispatch(addUser(updatedUser))

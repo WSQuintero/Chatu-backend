@@ -6,7 +6,7 @@ const initialState = {
 }
 
 const friendsChatSlice = createSlice({
-  name: 'user',
+  name: 'friend',
   initialState,
   reducers: {
     setFriend: (state, action) => {

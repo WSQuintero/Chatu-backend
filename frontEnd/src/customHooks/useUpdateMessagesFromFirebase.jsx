@@ -21,13 +21,12 @@ function useUpdateMessagesFromFirebase(setMessages, messages) {
         actualUser(actualUserInfo)?.messages?.arrayValue.values
 
       if (messagesInDbExist) {
-        const actualMessages = actualUser(
-          actualUserInfo
-        )?.messages?.arrayValue?.values.map((a) => {
+        const actualMessages = messagesInDbExist.map((a) => {
           return {
             message: a?.mapValue.fields.message.stringValue,
             sender: a?.mapValue.fields.sender.stringValue,
-            user: a?.mapValue.fields.user.stringValue
+            user: a?.mapValue.fields.user.stringValue,
+            idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
           }
         })
 

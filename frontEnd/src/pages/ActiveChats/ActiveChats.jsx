@@ -10,15 +10,9 @@ import { AddedFriends } from '../../components/AddedFriends/AddedFriends'
 
 function ActiveChats() {
   const { findUser: findFriend, userFound: found } = useSearchIdByEmail()
-  const { connectAndUpdate } = useConnectAndUpdate(found)
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
   const [inputSearch, setInputSearch] = useState('')
-
-  useEffect(() => {
-    if (found) {
-      connectAndUpdate(found)
-    }
-  }, [found])
+  useConnectAndUpdate(found)
 
   return (
     <Main>

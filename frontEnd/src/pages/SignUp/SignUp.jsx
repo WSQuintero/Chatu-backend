@@ -1,17 +1,15 @@
-import { useNavigate } from 'react-router'
+import { useState } from 'react'
 import { Main } from '../../components/Main/Main'
-import { useEffect, useState } from 'react'
 import { useAddUser } from '../../customHooks/useAddUser'
-import useAddUserInDb from '../../customHooks/useAddUserInDb'
+import { useSetErrorsInSignUp } from '../../customHooks/useSetErrorsInSignUp'
+import { useSendInformationUserToDb } from '../../customHooks/useSendInformationUserToDb'
 import './SignUp.css'
 
 function SignUp() {
   const { startAddUser, userCredential, errorAddUser } = useAddUser()
-  const { sendInformationUser, errorInfoAdded, confirmationInfoAdded } =
-    useAddUserInDb()
+
   const [userInformation, setUserInformation] = useState({})
   const [error, SetError] = useState('')
-  const navigate = useNavigate()
 
   const handleSignUp = (event) => {
     event.preventDefault()
@@ -30,43 +28,8 @@ function SignUp() {
       }, 2000)
     }
   }
-
-  useEffect(() => {
-    switch (errorAddUser?.errorCode) {
-      case 'auth/weak-password':
-        SetError('La contraseña debe ser mayor a 6 dígitos')
-        setTimeout(() => {
-          SetError('')
-        }, 2000)
-        break
-      case 'auth/email-already-in-use':
-        SetError('EL correo ya se encuentra registrado')
-        setTimeout(() => {
-          SetError('')
-        }, 2000)
-        break
-    }
-  }, [errorAddUser])
-
-  useEffect(() => {
-    if (userCredential?.accessToken) {
-      sendInformationUser({
-        ...userInformation,
-        uid: userCredential?.uid,
-        friends: [],
-        messages: [],
-        idConnection: []
-      })
-    }
-  }, [userCredential])
-
-  useEffect(() => {
-    if (confirmationInfoAdded) {
-      navigate('/login')
-    } else {
-      console.log(errorInfoAdded)
-    }
-  }, [confirmationInfoAdded, errorInfoAdded])
+  useSetErrorsInSignUp({ errorAddUser, SetError })
+  useSendInformationUserToDb({ userCredential, userInformation })
 
   return (
     <Main>

@@ -16,4 +16,4 @@ function useAddUserInDb() {
   return { sendInformationUser, errorInfoAdded, confirmationInfoAdded }
 }
 
-export default useAddUserInDb
+export  {useAddUserInDb}

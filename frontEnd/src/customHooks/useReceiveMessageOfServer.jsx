@@ -5,7 +5,8 @@ import { socket } from '../socket/socket'
 function useReceiveMessageOfServer(setMessages) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const friendInformation = useSelector((state) => state.friendInformation)
-
+  const friendUid = friendInformation?.friend?.uid?.stringValue
+  const idConnection = [friendUid, currentUser.uid].sort().join('')
   useEffect(() => {
     const receiveMessage = (message) => {
       const isUserOrFriend =
@@ -16,7 +17,8 @@ function useReceiveMessageOfServer(setMessages) {
       const newMessages = {
         message: message.message,
         user: isUserOrFriend,
-        sender: message.sender
+        sender: message.sender,
+        idConnection:idConnection
       }
 
       setMessages((prev) => {
