@@ -3,22 +3,66 @@ import { Main } from '../../components/Main/Main'
 import { SendMessage } from '../../components/SendMessage/SendMessage'
 import { useUpdateMessagesFromFirebase } from '../../customHooks/useUpdateMessagesFromFirebase'
 import { useReceiveMessageOfServer } from '../../customHooks/useReceiveMessageOfServer'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { socket } from '../../socket/socket'
+import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
+import { resetMessages, updateMessages } from '../../redux/messageSlice'
 const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
 
 function Chat() {
-  const [messages, setMessages] = useState([])
-  useReceiveMessageOfServer(setMessages)
-  useUpdateMessagesFromFirebase(setMessages, messages)
+  const messages = useSelector((state) => state.messages)
+  const dispatch = useDispatch()
+  useReceiveMessageOfServer()
+  useUpdateMessagesFromFirebase()
   const friendInformation = useSelector((state) => state.friendInformation)
   const friendUid = friendInformation?.friend?.uid?.stringValue
-  const idConnection = [friendUid, currentUser.uid].sort().join('')
+  const idConnection = [friendUid, currentUser?.uid].sort().join('')
+  const [saveInformationUser, setSaveInformationUser] = useState()
+  const { findUser, userFound: userInformation } = useSearchUserByEmail()
 
   useEffect(() => {
-    if (friendInformation) {
-      console.log(friendInformation)
+    dispatch(resetMessages())
+
+    findUser(currentUser.email)
+  }, [])
+  // useEffect(() => {
+
+  //   if (messages) {
+
+  //     const actualMessages =
+  //       saveInformationUser?.messages?.map((a) => ({
+  //         message: a?.mapValue.fields.message.stringValue,
+  //         sender: a?.mapValue.fields.sender.stringValue,
+  //         user: a?.mapValue.fields.user.stringValue,
+  //         idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
+  //       })) || []
+
+  //       actualMessages.forEach((mss) => {
+  //       dispatch(updateMessages(mss))
+  //     })
+  //   } else {
+  //     const actualMessages =
+  //       saveInformationUser?.messages?.map((a) => ({
+  //         message: a?.mapValue.fields.message.stringValue,
+  //         sender: a?.mapValue.fields.sender.stringValue,
+  //         user: a?.mapValue.fields.user.stringValue,
+  //         idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
+  //       })) || []
+
+  //     actualMessages.forEach((mss) => {
+  //       dispatch(updateMessages(mss))
+  //     })
+  //   }
+  // }, [userInformation])
+  useEffect(() => {
+    if (userInformation) {
+      setSaveInformationUser(userInformation)
     }
-  }, [friendInformation])
+  }, [userInformation])
+
+  // useEffect(() => {
+  //   console.log(messages)
+  // }, [messages])
 
   return (
     <Main>
@@ -30,7 +74,7 @@ function Chat() {
             //     message.sender === friendInformation.friend.email.stringValue
             // ) &&
             messages
-              .filter((mes) => mes.idConnection === idConnection)
+              ?.filter((mes) => mes.idConnection === idConnection)
               .map((message, index) =>
                 message.user === currentUser.name ? (
                   <li key={index} className='flex justify-end gap-2'>
@@ -42,7 +86,7 @@ function Chat() {
                       {currentUser.name}
                     </span>
                   </li>
-                ) :  (
+                ) : (
                   <li
                     key={index}
                     className='flex justify-start gap-2 text-[#088AE1]'>
@@ -51,7 +95,7 @@ function Chat() {
                       {message.message}
                     </p>
                   </li>
-                ) 
+                )
               )}
         </ul>
         <SendMessage />

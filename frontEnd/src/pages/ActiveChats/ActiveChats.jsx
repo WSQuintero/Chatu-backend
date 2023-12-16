@@ -9,10 +9,10 @@ import { useConnectAndUpdate } from '../../customHooks/useConnectAndUpdate'
 import { AddedFriends } from '../../components/AddedFriends/AddedFriends'
 
 function ActiveChats() {
-  const { findUser: findFriend, userFound: found } = useSearchIdByEmail()
+  const { findUser: findFriend, userFound: foundFriendInformation } = useSearchIdByEmail()
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
   const [inputSearch, setInputSearch] = useState('')
-  useConnectAndUpdate(found)
+  useConnectAndUpdate(foundFriendInformation)
 
   return (
     <Main>

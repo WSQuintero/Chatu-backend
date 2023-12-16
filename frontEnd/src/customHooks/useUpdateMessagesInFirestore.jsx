@@ -2,48 +2,44 @@ import { useEffect } from 'react'
 import { useUpdateInformationUser } from './useUpdateInformationUser'
 import { useSelector } from 'react-redux'
 
-function useUpdateMessagesInFirestore(actualUserInfo, messages) {
+function useUpdateMessagesInFirestore( ) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const { updateDocument: updateCurrentUserInfo } = useUpdateInformationUser()
   const friendInformation = useSelector((state) => state.friendInformation)
+  const messages = useSelector((state) => state.messages)
 
-  useEffect(() => {
+  const updateUserInDb = (actualUserInfo, idUserFound) => {
     if (actualUserInfo && messages) {
       const friendUid = friendInformation.friend.uid.stringValue
       const idConnection = [friendUid, currentUser.uid].sort().join('')
 
-      const actualUser = (information) =>
-        information._document.data.value.mapValue.fields
-
-      const actualUserFriends = actualUser(
-        actualUserInfo
-      ).friends.arrayValue.values.map((a) => {
-        return {
-          email: a.mapValue.fields.email.stringValue,
-          name: a.mapValue.fields.name.stringValue,
-          uid: a.mapValue.fields.uid.stringValue
+      const actualUserFriends = actualUserInfo.friends.arrayValue.values.map(
+        (a) => {
+          return {
+            email: a.mapValue.fields.email.stringValue,
+            name: a.mapValue.fields.name.stringValue,
+            uid: a.mapValue.fields.uid.stringValue
+          }
         }
-      })
+      )
 
       const newInformation = {
-        email: actualUser(actualUserInfo).email.stringValue,
-        name: actualUser(actualUserInfo).name.stringValue,
+        email: actualUserInfo.email.stringValue,
+        name: actualUserInfo.name.stringValue,
         friends: actualUserFriends,
-
-        uid: actualUser(actualUserInfo).uid.stringValue,
+        uid: actualUserInfo.uid.stringValue,
         messages: messages
       }
 
       updateCurrentUserInfo({
         nameOfCollection: 'users',
-        idDocument: actualUserInfo.id,
+        idDocument: idUserFound.id,
         newInformation: newInformation
       })
-      // console.log(actualUser(actualUserInfo))
     }
-  }, [messages])
+  }
 
-  return true
+  return { updateUserInDb }
 }
 
 export { useUpdateMessagesInFirestore }

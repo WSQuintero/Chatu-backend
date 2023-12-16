@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { resetMessages, updateMessages } from '../../redux/messageSlice'
+import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
+import { socket } from '../../socket/socket'
 
 function AddedFriends({ inputSearch, findFriend }) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const [filterInput, setFilterInput] = useState([])
   const [withoutResults, setWithoutResults] = useState(false)
+  const { findUser, userFound: userInformation } = useSearchUserByEmail()
+  const messages = useSelector((state) => state.messages)
+  const dispatch = useDispatch()
+  const [saveInformationUser, setSaveInformationUser] = useState()
+  useEffect(() => {
+    findUser(currentUser.email)
+  }, [])
 
   useEffect(() => {
     if (inputSearch !== '') {
@@ -25,6 +36,38 @@ function AddedFriends({ inputSearch, findFriend }) {
     }
   }, [inputSearch])
 
+  useEffect(() => {
+    if (userInformation) {
+      setSaveInformationUser(userInformation)
+    }
+  }, [userInformation])
+
+  const handleOpenFriendChat = (event) => {
+    dispatch(resetMessages())
+
+    if (messages) {
+      // dispatch(resetMessages())
+
+      messages.forEach((mss) => {
+        dispatch(updateMessages(mss))
+      })
+    } else {
+      const actualMessages =
+        saveInformationUser?.messages?.map((a) => ({
+          message: a?.mapValue.fields.message.stringValue,
+          sender: a?.mapValue.fields.sender.stringValue,
+          user: a?.mapValue.fields.user.stringValue,
+          idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
+        })) || []
+
+      console.log(actualMessages)
+      actualMessages.forEach((mss) => {
+        dispatch(updateMessages(mss))
+      })
+    }
+    findFriend(event.target.dataset.email)
+  }
+
   return (
     <>
       {inputSearch === ''
@@ -32,7 +75,7 @@ function AddedFriends({ inputSearch, findFriend }) {
             <article
               key={friend.uid}
               className='h-[50px] flex border border-[#37E23B] text-xs items-center px-5 gap-5 hover:bg-[#D7FFD7] cursor-pointer'
-              onClick={(event) => findFriend(event.target.dataset.email)}
+              onClick={handleOpenFriendChat}
               data-email={friend.email}>
               <img
                 src={friend?.img || '/img/no-user.jpg'}
@@ -48,7 +91,7 @@ function AddedFriends({ inputSearch, findFriend }) {
             <article
               key={friend.uid}
               className='h-[50px] flex border border-[#37E23B] text-xs items-center px-5 gap-5 hover:bg-[#D7FFD7] cursor-pointer'
-              onClick={(event) => findFriend(event.target.dataset.email)}
+              onClick={handleOpenFriendChat}
               data-email={friend.email}>
               <img
                 src={friend?.img || '/img/no-user.jpg'}

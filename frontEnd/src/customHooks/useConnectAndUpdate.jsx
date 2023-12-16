@@ -1,18 +1,18 @@
 import { openModalChat } from '../redux/openChatSlice'
 import { updateFriendInformation } from '../redux/friendInformationSlice'
 import { socket } from '../socket/socket'
-import { addUser } from '../redux/userSlice'
-import { useUpdateInformationUser } from './useUpdateInformationUser'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 
-function useConnectAndUpdate(found) {
+function useConnectAndUpdate(foundFriendInformation) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const connectToRoom = (idConnection) => {
+    dispatch(openModalChat(false))
+
     const connectionData = {
       id: idConnection,
       sender: currentUser.email
@@ -34,10 +34,12 @@ function useConnectAndUpdate(found) {
   }
 
   useEffect(() => {
-    if (found) {
-      const friendInformation = found?._document?.data.value.mapValue.fields
+    if (foundFriendInformation) {
+      const friendInformation =
+        foundFriendInformation?._document?.data.value.mapValue.fields
       const friendUid = friendInformation.uid.stringValue
       const idConnection = [friendUid, currentUser.uid].sort().join('')
+
       sessionStorage.setItem(
         'currentUser',
         JSON.stringify({ ...currentUser, idConnection })
@@ -45,7 +47,7 @@ function useConnectAndUpdate(found) {
       dispatch(updateFriendInformation(friendInformation))
       connectToRoom(idConnection)
     }
-  }, [found])
+  }, [foundFriendInformation])
 
   return true
 }

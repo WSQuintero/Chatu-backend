@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { useSearchIdByEmail } from './useSearchIdByEmail'
 import { useUpdateMessagesInFirestore } from './useUpdateMessagesInFirestore'
+import { useDispatch } from 'react-redux'
+import { resetMessages, updateMessages } from '../redux/messageSlice'
 
-function useUpdateMessagesFromFirebase(setMessages, messages) {
+function useUpdateMessagesFromFirebase() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
-
   const { findUser, userFound: actualUserInfo } = useSearchIdByEmail()
-  useUpdateMessagesInFirestore(actualUserInfo, messages)
+  const dispatch = useDispatch()
+  // useUpdateMessagesInFirestore(actualUserInfo)
 
   useEffect(() => {
     findUser(currentUser.email)
@@ -21,22 +23,23 @@ function useUpdateMessagesFromFirebase(setMessages, messages) {
         actualUser(actualUserInfo)?.messages?.arrayValue.values
 
       if (messagesInDbExist) {
-        const actualMessages = messagesInDbExist.map((a) => {
-          return {
-            message: a?.mapValue.fields.message.stringValue,
-            sender: a?.mapValue.fields.sender.stringValue,
-            user: a?.mapValue.fields.user.stringValue,
-            idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
-          }
-        })
+        const actualMessages = messagesInDbExist.map((a) => ({
+          message: a?.mapValue.fields.message.stringValue,
+          sender: a?.mapValue.fields.sender.stringValue,
+          user: a?.mapValue.fields.user.stringValue,
+          idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
+        }))
 
-        setMessages(actualMessages)
+        actualMessages.forEach((mss) => {
+          dispatch(updateMessages(mss)) // Fix dispatch here
+        })
       } else {
-        setMessages([])
+        dispatch(resetMessages())
       }
     }
   }, [actualUserInfo])
-  return <div>useUpdateMessagesFromFirebase</div>
+
+  return true
 }
 
 export { useUpdateMessagesFromFirebase }

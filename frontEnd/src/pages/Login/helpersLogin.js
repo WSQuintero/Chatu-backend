@@ -15,8 +15,10 @@ function updateActualUser({ foundUser, dispatch, navigate, addUser }) {
       uid: foundUser?.uid.stringValue,
       friends: friends
     }
+    
     sessionStorage.setItem('currentUser', JSON.stringify(updatedUser))
     dispatch(addUser(updatedUser))
+
     if (window.innerWidth < 800) {
       navigate('/active-chats')
     } else {
