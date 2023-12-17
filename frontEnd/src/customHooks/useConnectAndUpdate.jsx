@@ -40,11 +40,13 @@ function useConnectAndUpdate(foundFriendInformation) {
   }
 
   useEffect(() => {
+    socket.emit('leave')
     if (foundFriendInformation) {
       const friendInformation =
         foundFriendInformation?._document?.data.value.mapValue.fields
       const friendUid = friendInformation.uid.stringValue
       const idConnection = [friendUid, currentUser.uid].sort().join('')
+      setUserSstorage({ ...currentUser, idConnection: idConnection })
 
       updateInformationFriend(idConnection, friendInformation)
       connectToRoom(idConnection)

@@ -7,7 +7,7 @@ function useUpdateMessagesInFirestore() {
 
   const updateUserInDb = (actualUserInfo, idUserFound) => {
     if (actualUserInfo && messages) {
-      const actualUserFriends = actualUserInfo.friends.arrayValue.values.map(
+      const actualUserFriends = actualUserInfo?.friends?.arrayValue?.values?.map(
         (a) => {
           return {
             email: a.mapValue.fields.email.stringValue,
@@ -15,7 +15,7 @@ function useUpdateMessagesInFirestore() {
             uid: a.mapValue.fields.uid.stringValue
           }
         }
-      )
+      )||[]
 
       const newInformation = {
         email: actualUserInfo.email.stringValue,
