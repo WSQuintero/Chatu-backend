@@ -9,10 +9,10 @@ import { useSearchIdByEmail } from './useSearchIdByEmail'
 function useReceiveMessageOfServer() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const friendInformation = useSelector((state) => state.friendInformation)
+  const messages = useSelector((state) => state.messages)
   const friendUid = friendInformation?.friend?.uid?.stringValue
   const idConnection = [friendUid, currentUser.uid].sort().join('')
   const dispatch = useDispatch()
-  const messages = useSelector((state) => state.messages)
   const { updateUserInDb } = useUpdateMessagesInFirestore()
 const { findUser, userFound } = useSearchUserByEmail()
 const { findUser:findIdUser, userFound:idUserFound } = useSearchIdByEmail()
@@ -26,6 +26,7 @@ useEffect(() => {
   useEffect(() => {
     findUser(currentUser.email)
     findIdUser(currentUser.email)
+    
     const receiveMessage = (message) => {
       const isUserOrFriend =
         message.sender === currentUser?.email

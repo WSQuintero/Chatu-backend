@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
 import { IconContext } from 'react-icons/lib'
 import { IoIosAddCircle } from 'react-icons/io'
-import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
 import { Main } from '../../components/Main/Main'
 import { ModalSearchFriend } from '../../components/ModalSearchFriend/ModalSearchFriend'
-import { useConnectAndUpdate } from '../../customHooks/useConnectAndUpdate'
 import { AddedFriends } from '../../components/AddedFriends/AddedFriends'
 
 function ActiveChats() {
