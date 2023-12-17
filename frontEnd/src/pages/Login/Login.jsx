@@ -38,7 +38,7 @@ function Login() {
 
   return (
     <Main>
-      <div className='sm:w-3/5 sm:h-4/5 w-[90%] bg-white rounded-3xl shadow-green-950 shadow-xl flex justify-center text-[#37E23B]'>
+      <div className='sm:w-3/5 sm:h-4/5 w-[80%] h-5/6 bg-white rounded-3xl shadow-green-950 shadow-xl flex justify-center text-[#37E23B]'>
         <figure className=' h-full w-6/12 relative hidden lg:flex'>
           <img
             src='/img/chica-texteando.jpg '
@@ -48,8 +48,8 @@ function Login() {
         </figure>
         <form
           onSubmit={handleLogin}
-          className='flex flex-col h-full w-full lg:w-5/12 overflow-hidden p-10 items-center gap-5 relative mr-5 '>
-          <img src='/logo.png' alt='' className='h-4/6 object-contain ' />
+          className='flex flex-col h-full w-full lg:w-5/12 overflow-hidden p-5 items-center gap-5 relative mr-5 '>
+          <img src='/logo.png' alt='' className='h-2/6 object-contain ' />
           <h2>Inicio de sesión</h2>
           <label
             htmlFor=''
@@ -92,10 +92,10 @@ function Login() {
               <a href='/sign-up'>¿No tienes cuenta aún?</a>
             </span>
           </div>
-          <button className='h-1/6 mt-10 bg-[#37E23B] text-white p-2 px-10  rounded-xl hover:bg-[#D7FFD7] hover:text-[#37E23B] hover:border hover:border-[#37E23B] '>
+          <button className='h-[30px]  bg-[#37E23B] text-white mt-3 px-10  rounded-xl hover:bg-[#D7FFD7] hover:text-[#37E23B] hover:border hover:border-[#37E23B] '>
             Iniciar sesión
           </button>
-          <span className='text-red-600'>{error}</span>
+          <span className='text-red-600 text-center'>{error}</span>
         </form>
       </div>
     </Main>

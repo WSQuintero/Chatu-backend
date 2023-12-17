@@ -2,69 +2,26 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { resetMessages, updateMessages } from '../../redux/messageSlice'
 import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
-import { socket } from '../../socket/socket'
+import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
+import { useConnectAndUpdate } from '../../customHooks/useConnectAndUpdate'
+import { useSearchUserByInput } from '../../customHooks/useSearchUserByInput'
+import { useGetInformationUser } from '../../customHooks/useGetInformationUser'
+import { useUpdateExistMessages } from '../../customHooks/useUpdateExistMessages'
 
-function AddedFriends({ inputSearch, findFriend }) {
+function AddedFriends({ inputSearch }) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
-  const [filterInput, setFilterInput] = useState([])
-  const [withoutResults, setWithoutResults] = useState(false)
-  const { findUser, userFound: userInformation } = useSearchUserByEmail()
-  const messages = useSelector((state) => state.messages)
-  const dispatch = useDispatch()
-  const [saveInformationUser, setSaveInformationUser] = useState()
-  useEffect(() => {
-    findUser(currentUser.email)
-  }, [])
+  const { findUser: findFriend, userFound: foundFriend } = useSearchIdByEmail()
+  const { updateMessagesInDb } = useUpdateExistMessages()
+  const { saveInformationUser } = useGetInformationUser(currentUser)
+  useConnectAndUpdate(foundFriend)
 
-  useEffect(() => {
-    if (inputSearch !== '') {
-      const userFriends = currentUser.friends
-      const filterMessages = userFriends.filter((message) => {
-        return message.name.includes(String(inputSearch.toLowerCase()))
-        //agregar despues la lógica para buscar por mensaje
-      })
-      setFilterInput(filterMessages)
-
-      if (filterMessages.length === 0) {
-        setWithoutResults(true)
-        setTimeout(() => {
-          setWithoutResults(false)
-        }, 2000)
-      } else {
-        setWithoutResults(false)
-      }
-    }
-  }, [inputSearch])
-
-  useEffect(() => {
-    if (userInformation) {
-      setSaveInformationUser(userInformation)
-    }
-  }, [userInformation])
+  const { filterInput, withoutResults } = useSearchUserByInput(
+    inputSearch,
+    currentUser
+  )
 
   const handleOpenFriendChat = (event) => {
-    dispatch(resetMessages())
-
-    if (messages) {
-      // dispatch(resetMessages())
-
-      messages.forEach((mss) => {
-        dispatch(updateMessages(mss))
-      })
-    } else {
-      const actualMessages =
-        saveInformationUser?.messages?.map((a) => ({
-          message: a?.mapValue.fields.message.stringValue,
-          sender: a?.mapValue.fields.sender.stringValue,
-          user: a?.mapValue.fields.user.stringValue,
-          idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
-        })) || []
-
-      console.log(actualMessages)
-      actualMessages.forEach((mss) => {
-        dispatch(updateMessages(mss))
-      })
-    }
+    updateMessagesInDb(saveInformationUser)
     findFriend(event.target.dataset.email)
   }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
 import { IconContext } from 'react-icons/lib'
 import { IoIosAddCircle } from 'react-icons/io'
@@ -9,10 +9,8 @@ import { useConnectAndUpdate } from '../../customHooks/useConnectAndUpdate'
 import { AddedFriends } from '../../components/AddedFriends/AddedFriends'
 
 function ActiveChats() {
-  const { findUser: findFriend, userFound: foundFriendInformation } = useSearchIdByEmail()
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
   const [inputSearch, setInputSearch] = useState('')
-  useConnectAndUpdate(foundFriendInformation)
 
   return (
     <Main>
@@ -35,7 +33,7 @@ function ActiveChats() {
             }}
           />
         </div>
-        <AddedFriends inputSearch={inputSearch} findFriend={findFriend} />
+        <AddedFriends inputSearch={inputSearch} />
       </div>
       <button onClick={() => setOpenModalSearchFriends(true)}>
         <IconContext.Provider

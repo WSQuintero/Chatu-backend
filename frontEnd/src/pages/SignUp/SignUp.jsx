@@ -33,7 +33,7 @@ function SignUp() {
 
   return (
     <Main>
-      <div className='sm:w-3/5 sm:h-4/5 w-[90%] bg-white rounded-3xl shadow-green-950 shadow-xl flex justify-center text-[#37E23B]'>
+      <div className='sm:w-3/5 sm:h-4/5 w-[90%] h-[90%] bg-white rounded-3xl shadow-green-950 shadow-xl flex justify-center text-[#37E23B]'>
         <figure className=' h-full w-6/12 relative hidden lg:flex'>
           <img
             src='/img/chica-señalando.jpg '
@@ -44,7 +44,7 @@ function SignUp() {
         <form
           onSubmit={handleSignUp}
           className='flex flex-col h-full w-full lg:w-5/12 overflow-hidden p-10 items-center gap-5 relative mr-5 '>
-          <img src='/logo.png' alt='' className='h-2/6 object-contain ' />
+          <img src='/logo.png' alt='' className='h-1/6 sm:h-1/6 object-contain ' />
           <h2>Registro de usuario</h2>
           <label
             htmlFor=''
