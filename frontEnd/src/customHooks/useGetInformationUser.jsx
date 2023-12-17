@@ -4,6 +4,7 @@ import { useSearchUserByEmail } from "./useSearchUserByEmail"
 function useGetInformationUser(currentUser) {
   const [saveInformationUser, setSaveInformationUser] = useState()
     const { findUser, userFound: userInformation } = useSearchUserByEmail()
+    
     useEffect(() => {
       findUser(currentUser.email)
     }, [])

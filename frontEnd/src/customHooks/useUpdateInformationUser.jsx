@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 function useUpdateInformationUser() {
   const [isOkayUpdate, setIsOkayUpdate] = useState(false)
+  
   const updateDocument = async ({
     nameOfCollection,
     idDocument,

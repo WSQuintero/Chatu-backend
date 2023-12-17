@@ -1,18 +1,12 @@
-import { useEffect } from 'react'
 import { useUpdateInformationUser } from './useUpdateInformationUser'
 import { useSelector } from 'react-redux'
 
-function useUpdateMessagesInFirestore( ) {
-  const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
+function useUpdateMessagesInFirestore() {
   const { updateDocument: updateCurrentUserInfo } = useUpdateInformationUser()
-  const friendInformation = useSelector((state) => state.friendInformation)
   const messages = useSelector((state) => state.messages)
 
   const updateUserInDb = (actualUserInfo, idUserFound) => {
     if (actualUserInfo && messages) {
-      const friendUid = friendInformation.friend.uid.stringValue
-      const idConnection = [friendUid, currentUser.uid].sort().join('')
-
       const actualUserFriends = actualUserInfo.friends.arrayValue.values.map(
         (a) => {
           return {

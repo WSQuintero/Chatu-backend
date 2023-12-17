@@ -1,22 +1,24 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useState } from 'react'
+import { auth } from '../firebase/firebase'
+import { useDispatch } from 'react-redux'
+import { setIsUserAuthenticated } from '../redux/userAtuhenticated'
 
 function useAccessUser() {
   const [userAuthenticated, setUserAuthenticated] = useState(null)
   const [errorUserAuthenticated, setErrorUserAuthenticated] = useState({})
-
+  const dispatch = useDispatch()
   const startAccessUser = (email, password) => {
-    const auth = getAuth()
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user
-        setUserAuthenticated(user)
+        setUserAuthenticated(userCredential.user)
+        dispatch(setIsUserAuthenticated(true))
       })
       .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-
-        setErrorUserAuthenticated({ errorCode, errorMessage })
+        setErrorUserAuthenticated({
+          errorCode: error.code,
+          errorMessage: error.message
+        })
       })
   }
   return { startAccessUser, userAuthenticated, errorUserAuthenticated }

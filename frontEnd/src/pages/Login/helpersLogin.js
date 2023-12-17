@@ -1,4 +1,12 @@
-function updateActualUser({ foundUser, dispatch, navigate, addUser }) {
+import { setUserSstorage } from '../../helpers/setUserSstorage'
+
+function updateActualUser({
+  foundUser,
+  dispatch,
+  navigate,
+  addUser,
+  isUserAuthenticated
+}) {
   if (foundUser) {
     const friends =
       foundUser?.friends?.arrayValue?.values?.map((friend) => {
@@ -13,10 +21,11 @@ function updateActualUser({ foundUser, dispatch, navigate, addUser }) {
       name: foundUser?.name.stringValue,
       email: foundUser?.email.stringValue,
       uid: foundUser?.uid.stringValue,
-      friends: friends
+      friends: friends,
+      isUserAuthenticated
     }
-    
-    sessionStorage.setItem('currentUser', JSON.stringify(updatedUser))
+
+    setUserSstorage(updatedUser)
     dispatch(addUser(updatedUser))
 
     if (window.innerWidth < 800) {
@@ -46,7 +55,5 @@ function verifyAuthentication({
     }
   }
 }
-
-
 
 export { updateActualUser, verifyAuthentication }

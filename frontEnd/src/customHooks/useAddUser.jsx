@@ -9,16 +9,13 @@ function useAddUser() {
   const startAddUser = (email, password) => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user
-        setUserCredential(user)
+        setUserCredential(userCredential.user)
       })
       .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        setErrorAddUser({ errorCode, errorMessage })
+        setErrorAddUser({ errorCode: error.code, errorMessage: error.message })
       })
   }
-  return {startAddUser, userCredential, errorAddUser }
+  return { startAddUser, userCredential, errorAddUser }
 }
 
-export  {useAddUser}
+export { useAddUser }

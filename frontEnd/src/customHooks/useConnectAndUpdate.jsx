@@ -4,6 +4,7 @@ import { socket } from '../socket/socket'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
+import { setUserSstorage } from '../helpers/setUserSstorage'
 
 function useConnectAndUpdate(foundFriendInformation) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
@@ -33,6 +34,11 @@ function useConnectAndUpdate(foundFriendInformation) {
     socket.emit('join', connectionData)
   }
 
+  const updateInformationFriend = (idConnection, friendInformation) => {
+    setUserSstorage({ ...currentUser, idConnection })
+    dispatch(updateFriendInformation(friendInformation))
+  }
+
   useEffect(() => {
     if (foundFriendInformation) {
       const friendInformation =
@@ -40,11 +46,7 @@ function useConnectAndUpdate(foundFriendInformation) {
       const friendUid = friendInformation.uid.stringValue
       const idConnection = [friendUid, currentUser.uid].sort().join('')
 
-      sessionStorage.setItem(
-        'currentUser',
-        JSON.stringify({ ...currentUser, idConnection })
-      )
-      dispatch(updateFriendInformation(friendInformation))
+      updateInformationFriend(idConnection, friendInformation)
       connectToRoom(idConnection)
     }
   }, [foundFriendInformation])

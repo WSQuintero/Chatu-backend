@@ -9,6 +9,7 @@ import { resetMessages } from '../../redux/messageSlice'
 function Chat() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const messages = useSelector((state) => state.messages)
+
   const dispatch = useDispatch()
 
   useReceiveMessageOfServer()

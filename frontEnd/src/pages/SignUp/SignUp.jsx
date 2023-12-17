@@ -1,15 +1,15 @@
 import { useState } from 'react'
-import { Main } from '../../components/Main/Main'
 import { useAddUser } from '../../customHooks/useAddUser'
 import { useSetErrorsInSignUp } from '../../customHooks/useSetErrorsInSignUp'
 import { useSendInformationUserToDb } from '../../customHooks/useSendInformationUserToDb'
 import './SignUp.css'
 
 function SignUp() {
-  const { startAddUser, userCredential, errorAddUser } = useAddUser()
-
   const [userInformation, setUserInformation] = useState({})
+  const { startAddUser, userCredential, errorAddUser } = useAddUser()
   const [error, SetError] = useState('')
+  useSetErrorsInSignUp({ errorAddUser, SetError })
+  useSendInformationUserToDb({ userCredential, userInformation })
 
   const handleSignUp = (event) => {
     event.preventDefault()
@@ -28,11 +28,9 @@ function SignUp() {
       }, 2000)
     }
   }
-  useSetErrorsInSignUp({ errorAddUser, SetError })
-  useSendInformationUserToDb({ userCredential, userInformation })
 
   return (
-    <Main>
+    <main className='bg-gradient-to-r from-white to-green-500 w-full h-[100vh] relative flex flex-col justify-center items-center'>
       <div className='sm:w-3/5 sm:h-4/5 w-[90%] h-[90%] bg-white rounded-3xl shadow-green-950 shadow-xl flex justify-center text-[#37E23B]'>
         <figure className=' h-full w-6/12 relative hidden lg:flex'>
           <img
@@ -44,7 +42,11 @@ function SignUp() {
         <form
           onSubmit={handleSignUp}
           className='flex flex-col h-full w-full lg:w-5/12 overflow-hidden p-10 items-center gap-5 relative mr-5 '>
-          <img src='/logo.png' alt='' className='h-1/6 sm:h-1/6 object-contain ' />
+          <img
+            src='/logo.png'
+            alt=''
+            className='h-1/6 sm:h-1/6 object-contain '
+          />
           <h2>Registro de usuario</h2>
           <label
             htmlFor=''
@@ -125,7 +127,7 @@ function SignUp() {
           <span className='text-red-600'>{error}</span>
         </form>
       </div>
-    </Main>
+    </main>
   )
 }
 

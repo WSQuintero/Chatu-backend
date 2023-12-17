@@ -13,20 +13,20 @@ function useReceiveMessageOfServer() {
   const friendUid = friendInformation?.friend?.uid?.stringValue
   const idConnection = [friendUid, currentUser.uid].sort().join('')
   const dispatch = useDispatch()
+  const { findUser, userFound } = useSearchUserByEmail()
+  const { findUser: findIdUser, userFound: idUserFound } = useSearchIdByEmail()
   const { updateUserInDb } = useUpdateMessagesInFirestore()
-const { findUser, userFound } = useSearchUserByEmail()
-const { findUser:findIdUser, userFound:idUserFound } = useSearchIdByEmail()
-  
-useEffect(() => {
-  if (userFound && idUserFound) {
-    updateUserInDb(userFound, idUserFound,messages)
-  }
-}, [userFound, idUserFound,messages])
+
+  useEffect(() => {
+    if (userFound && idUserFound) {
+      updateUserInDb(userFound, idUserFound, messages)
+    }
+  }, [userFound, idUserFound, messages])
 
   useEffect(() => {
     findUser(currentUser.email)
     findIdUser(currentUser.email)
-    
+
     const receiveMessage = (message) => {
       const isUserOrFriend =
         message.sender === currentUser?.email

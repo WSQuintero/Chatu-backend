@@ -5,6 +5,7 @@ import { db } from '../firebase/firebase'
 function useAddUserInDb() {
   const [confirmationInfoAdded, setConfirmationInfoAdded] = useState(null)
   const [errorInfoAdded, setErrorInfoAdded] = useState(null)
+
   const sendInformationUser = async (informationUser) => {
     try {
       const docRef = await addDoc(collection(db, 'users'), informationUser)
@@ -16,4 +17,4 @@ function useAddUserInDb() {
   return { sendInformationUser, errorInfoAdded, confirmationInfoAdded }
 }
 
-export  {useAddUserInDb}
+export { useAddUserInDb }
