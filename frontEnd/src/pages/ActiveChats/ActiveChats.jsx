@@ -30,7 +30,7 @@ function ActiveChats() {
   }, [])
 
   useEffect(() => {
-    if (userFound && userInformation) {
+    if (userFound && userInformation && imgUrl) {
       const actualMessages =
         userInformation?.messages?.arrayValue?.values?.map((mss) => {
           return {

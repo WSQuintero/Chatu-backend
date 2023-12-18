@@ -46,7 +46,6 @@ function useConnectAndUpdate(foundFriendInformation) {
         foundFriendInformation?._document?.data.value.mapValue.fields
       const friendUid = friendInformation.uid.stringValue
       const idConnection = [friendUid, currentUser.uid].sort().join('')
-      setUserSstorage({ ...currentUser, idConnection: idConnection })
 
       updateInformationFriend(idConnection, friendInformation)
       connectToRoom(idConnection)

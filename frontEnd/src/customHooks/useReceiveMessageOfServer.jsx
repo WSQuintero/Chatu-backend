@@ -9,6 +9,7 @@ import { useUpdateInformationUser } from './useUpdateInformationUser'
 import { transformMessages } from '../helpers/transformMessages'
 import { updatedInformation } from '../helpers/updatedInformation'
 import { transformFriends } from '../helpers/transformFriends'
+import { setUserSstorage } from '../helpers/setUserSstorage'
 
 function useReceiveMessageOfServer() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
@@ -23,9 +24,9 @@ function useReceiveMessageOfServer() {
   const { updateDocument } = useUpdateInformationUser()
   const dispatch = useDispatch()
   const { findUser: findFriendInformation, userFound: friendFound } =
-  useSearchUserByEmail()
+    useSearchUserByEmail()
   const { findUser: findIdFriend, userFound: idFriendFound } =
-  useSearchIdByEmail()
+    useSearchIdByEmail()
 
   useEffect(() => {
     if (userFound && idUserFound) {
@@ -77,7 +78,6 @@ function useReceiveMessageOfServer() {
         sender: message.sender,
         idConnection: idConnection
       }
-
       dispatch(updateMessages(newMessages))
     }
 
@@ -85,6 +85,10 @@ function useReceiveMessageOfServer() {
 
     return () => socket.off('message', receiveMessage)
   }, [])
+  
+  useEffect(() => {
+    setUserSstorage({ ...currentUser, messages })
+  }, [messages])
 }
 
 export { useReceiveMessageOfServer }

@@ -35,8 +35,7 @@ function updateFriendsOfUser({
         idDocument: actualIdOfCollection,
         newInformation: {
           ...currentUser,
-          friends: updatedUser,
-          messages: []
+          friends: updatedUser
         }
       })
       updateFriendsInSstorage(updatedUser)

@@ -5,7 +5,7 @@ import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
 import { useUpdateInformationUser } from '../../customHooks/useUpdateInformationUser'
 import { setUserSstorage } from '../../helpers/setUserSstorage'
 import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setUserFriends } from '../../redux/userFriendsInformationSlice'
 import { openModalChat } from '../../redux/openChatSlice'
 import { transformMessages } from '../../helpers/transformMessages'
@@ -14,42 +14,62 @@ import { updatedInformation } from '../../helpers/updatedInformation'
 
 function Friend({ handleOpenFriendChat, friend }) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
+  const userFriendsInformation = useSelector(
+    (state) => state.userFriendsInformation
+  )
   const [openDeleteFriendModal, setOpenDeleteFriendModal] = useState(false)
   const { updateDocument, isOkayUpdate } = useUpdateInformationUser()
   const { findUser, userFound } = useSearchUserByEmail()
   const { findUser: findIdUser, userFound: idUserFound } = useSearchIdByEmail()
+  const [friendToDelete, setFriendToDelete] = useState('')
   const dispatch = useDispatch()
 
   useEffect(() => {
     findUser(currentUser.email)
     findIdUser(currentUser.email)
-  }, [isOkayUpdate])
+  }, [])
 
   const deleteFriend = (event) => {
+    findUser(currentUser.email)
+    findIdUser(currentUser.email)
     const friendToDelete = event.target.parentNode.parentNode.dataset.email
-    const actualMessages = transformMessages(userFound)
 
-    const friends =
-      transformFriends(userFound).filter((fr) => fr.email !== friendToDelete) ||
-      []
-
-    const keepInfo = updatedInformation({ userFound, friends, actualMessages })
-
-    updateDocument({
-      nameOfCollection: 'users',
-      idDocument: idUserFound.id,
-      newInformation: keepInfo
-    })
-
-    setUserSstorage({
-      ...keepInfo,
-      isUserAuthenticated: true,
-      messages: []
-    })
-
-    dispatch(setUserFriends(friends))
     dispatch(openModalChat(false))
+    setFriendToDelete(friendToDelete)
   }
+
+  useEffect(() => {
+    if (userFriendsInformation && friendToDelete && userFound) {
+      const actualMessages = transformMessages(userFound)
+
+      const friends =
+        transformFriends(userFound)?.filter(
+          (fr) => fr.email !== friendToDelete
+        ) || []
+
+      const keepInfo = updatedInformation({
+        userFound,
+        friends,
+        actualMessages
+      })
+      if (friends) {
+        updateDocument({
+          nameOfCollection: 'users',
+          idDocument: idUserFound.id,
+          newInformation: keepInfo
+        })
+
+        setUserSstorage({
+          ...keepInfo,
+          isUserAuthenticated: true,
+          messages: []
+        })
+        console.log(friends)
+    dispatch(setUserFriends(friends))
+
+      }
+    }
+  }, [userFound, idUserFound])
 
   return (
     <article

@@ -14,7 +14,7 @@ function useUpdateExistMessages() {
       })
     } else {
       const actualMessages =
-        saveInformationUser?.messages?.map((a) => ({
+        saveInformationUser?.messages?.arrayValue?.values?.map((a) => ({
           message: a?.mapValue.fields.message.stringValue,
           sender: a?.mapValue.fields.sender.stringValue,
           user: a?.mapValue.fields.user.stringValue,

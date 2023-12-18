@@ -9,7 +9,7 @@ function useUpdateMessagesFromFirebase() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const { findUser, userFound: actualUserInfo } = useSearchIdByEmail()
   const dispatch = useDispatch()
-  // useUpdateMessagesInFirestore(actualUserInfo)
+  useUpdateMessagesInFirestore(actualUserInfo)
 
   useEffect(() => {
     findUser(currentUser.email)
