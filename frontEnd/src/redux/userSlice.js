@@ -5,7 +5,8 @@ const initialState = JSON.parse(sessionStorage.getItem('currentUser')) || {
   email: null,
   friends: [],
   uid: [],
-  idConnection: null
+  idConnection: null,
+  perfilPhoto:null
 }
 
 const userSlice = createSlice({

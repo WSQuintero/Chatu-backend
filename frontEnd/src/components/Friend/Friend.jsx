@@ -73,7 +73,6 @@ function Friend({ handleOpenFriendChat, friend }) {
     dispatch(openModalChat(false))
   }
 
-  console.log(friend)
   return (
     <article
       key={friend.uid}

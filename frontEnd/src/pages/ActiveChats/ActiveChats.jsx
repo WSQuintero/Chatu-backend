@@ -21,7 +21,6 @@ function ActiveChats() {
   const { findUser: findUserInformation, userFound: userInformation } =
     useSearchUserByEmail()
 
-  console.log(currentUser)
   const handleSendImg = (event) => {
     uploadImg(event.target.files[0])
   }

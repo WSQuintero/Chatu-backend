@@ -22,7 +22,7 @@ function useUpdateMessagesInFirestore() {
         friends: actualUserFriends,
         uid: actualUserInfo.uid.stringValue,
         messages: messages,
-        perfilPhoto: perfilPhoto.uid.stringValue
+        perfilPhoto: actualUserInfo.perfilPhoto.stringValue 
       }
 
       updateCurrentUserInfo({
