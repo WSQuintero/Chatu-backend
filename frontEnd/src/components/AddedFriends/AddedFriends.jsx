@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import { SelectFriendsUserInformation } from '../SelectFriendsUserInformation/SelectFriendsUserInformation'
 
 function AddedFriends({ inputSearch }) {
+  const userFriends = useSelector((state) => state.userFriendsInformation)
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const { findUser: findFriend, userFound: foundFriend } = useSearchIdByEmail()
   const { saveInformationUser } = useGetInformationUser(currentUser)
@@ -17,7 +18,6 @@ function AddedFriends({ inputSearch }) {
     inputSearch,
     currentUser
   )
-  const userFriends = useSelector((state) => state.userFriendsInformation)
   useConnectAndUpdate(foundFriend)
 
   const handleOpenFriendChat = (event) => {

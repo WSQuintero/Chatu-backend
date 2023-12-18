@@ -12,12 +12,10 @@ function ModalSearchFriend({
 
   const handleSearchFriend = (event) => {
     event.preventDefault()
-    setUserFound(undefined)
-
     const searchUserByEmail = event.target.elements.searchUserByEmail.value
 
+    setUserFound(undefined)
     findUser(searchUserByEmail)
-
   }
 
   return (
@@ -54,7 +52,7 @@ function ModalSearchFriend({
               Buscar
             </button>
           </form>
-          <FoundFriend userFound={userFound}  />
+          <FoundFriend userFound={userFound} />
         </section>
       )}
     </>

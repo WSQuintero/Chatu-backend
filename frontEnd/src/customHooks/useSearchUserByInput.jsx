@@ -9,8 +9,8 @@ function useSearchUserByInput( inputSearch, currentUser ) {
       const userFriends = currentUser.friends
       const filterMessages = userFriends.filter((message) => {
         return message.name.includes(String(inputSearch.toLowerCase()))
-        //agregar despues la lógica para buscar por mensaje
       })
+
       setFilterInput(filterMessages)
 
       if (filterMessages.length === 0) {
@@ -22,6 +22,7 @@ function useSearchUserByInput( inputSearch, currentUser ) {
         setWithoutResults(false)
       }
     }
+    
   }, [inputSearch])
 
   return { filterInput, withoutResults }

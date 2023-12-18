@@ -3,6 +3,7 @@ import { useSearchIdByEmail } from './useSearchIdByEmail'
 import { useUpdateMessagesInFirestore } from './useUpdateMessagesInFirestore'
 import { useDispatch } from 'react-redux'
 import { resetMessages, updateMessages } from '../redux/messageSlice'
+import { transformMessages } from '../helpers/transformMessages'
 
 function useUpdateMessagesFromFirebase() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
@@ -19,18 +20,10 @@ function useUpdateMessagesFromFirebase() {
       information?._document?.data.value.mapValue.fields
 
     if (actualUserInfo) {
-      const messagesInDbExist =
-        actualUser(actualUserInfo)?.messages?.arrayValue.values
+      const messagesInDbExist = actualUser(actualUserInfo)
 
       if (messagesInDbExist) {
-        const actualMessages = messagesInDbExist.map((a) => ({
-          message: a?.mapValue.fields.message.stringValue,
-          sender: a?.mapValue.fields.sender.stringValue,
-          user: a?.mapValue.fields.user.stringValue,
-          idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
-        }))
-
-        actualMessages.forEach((mss) => {
+        transformMessages(messagesInDbExist).forEach((mss) => {
           dispatch(updateMessages(mss)) // Fix dispatch here
         })
       } else {

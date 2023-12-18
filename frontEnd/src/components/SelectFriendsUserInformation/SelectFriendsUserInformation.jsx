@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react'
 import { Friend } from '../Friend/Friend'
 
 function SelectFriendsUserInformation({
@@ -6,10 +5,7 @@ function SelectFriendsUserInformation({
   currentUser,
   handleOpenFriendChat
 }) {
-  useEffect(() => {
-    console.log(userFriends)
-    console.log(currentUser)
-  }, [userFriends])
+
 
   return (
     <>

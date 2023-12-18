@@ -7,21 +7,19 @@ function useSearchUserByEmail() {
 
   const findUser = async (email) => {
     const refCollection = collection(db, 'users')
+
     try {
       const querySnapshot = await getDocs(refCollection)
-      
+
       const foundUser = Array(...querySnapshot.docs).find((doc) => {
-        const foundEmail =
-        doc._document.data.value.mapValue.fields.email.stringValue
-        return email === foundEmail
+        return (
+          email === doc._document.data.value.mapValue.fields.email.stringValue
+        )
       })._document.data.value.mapValue.fields
-      
-      if (foundUser) {
-        setUserFound(foundUser)
-      }
-      if (querySnapshot.empty) {
-        console.log('La colección está vacía.')
-      }
+
+      if (foundUser) setUserFound(foundUser)
+
+      if (querySnapshot.empty) console.log('La colección está vacía.')
     } catch (error) {
       console.error('Error al obtener documentos de la colección:', error)
     }

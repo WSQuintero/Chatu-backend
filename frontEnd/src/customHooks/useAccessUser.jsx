@@ -8,6 +8,7 @@ function useAccessUser() {
   const [userAuthenticated, setUserAuthenticated] = useState(null)
   const [errorUserAuthenticated, setErrorUserAuthenticated] = useState({})
   const dispatch = useDispatch()
+  
   const startAccessUser = (email, password) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {

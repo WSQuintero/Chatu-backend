@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect } from 'react'
 
 function useSetErrorsInSignUp({ errorAddUser, SetError }) {
   useEffect(() => {
@@ -17,7 +17,8 @@ function useSetErrorsInSignUp({ errorAddUser, SetError }) {
         break
     }
   }, [errorAddUser])
+
   return true
 }
 
-export  {useSetErrorsInSignUp}
+export { useSetErrorsInSignUp }

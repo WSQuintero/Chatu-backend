@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 function useReadUserInDb() {
   const [foundUser, setFoundUser] = useState(null)
+
   const readUserInDb = async (uid) => {
     const querySnapshot = await getDocs(collection(db, 'users'))
     const currentUser = Array(...querySnapshot.docs).find((user) => {
@@ -11,6 +12,7 @@ function useReadUserInDb() {
 
       return String(foundUid) === String(uid)
     })
+
     setFoundUser(currentUser._document.data.value.mapValue.fields)
   }
   return { readUserInDb, foundUser }

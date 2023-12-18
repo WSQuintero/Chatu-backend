@@ -29,6 +29,7 @@ function useGetIdOfCollection() {
     }
   }
   getDocumentId()
+  
   return {  actualIdOfCollection }
 }
 

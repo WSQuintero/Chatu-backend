@@ -16,8 +16,7 @@ function useSendInformationUserToDb({ userCredential, userInformation }) {
         friends: [],
         messages: [],
         idConnection: [],
-        perfilPhoto:
-          'https://www.selectenglish.co.uk/wp-content/uploads/2022/11/no-user-image.gif'
+        perfilPhoto: '/img/no-user.jpg'
       })
     }
   }, [userCredential])

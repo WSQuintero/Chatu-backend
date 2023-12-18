@@ -1,20 +1,21 @@
-import { useEffect, useState } from "react"
-import { useSearchUserByEmail } from "./useSearchUserByEmail"
+import { useEffect, useState } from 'react'
+import { useSearchUserByEmail } from './useSearchUserByEmail'
 
 function useGetInformationUser(currentUser) {
   const [saveInformationUser, setSaveInformationUser] = useState()
-    const { findUser, userFound: userInformation } = useSearchUserByEmail()
-    
-    useEffect(() => {
-      findUser(currentUser.email)
-    }, [])
+  const { findUser, userFound: userInformation } = useSearchUserByEmail()
 
-    useEffect(() => {
-      if (userInformation) {
-        setSaveInformationUser(userInformation)
-      }
-    }, [userInformation])
+  useEffect(() => {
+    findUser(currentUser.email)
+  }, [])
+
+  useEffect(() => {
+    if (userInformation) {
+      setSaveInformationUser(userInformation)
+    }
+  }, [userInformation])
+
   return { saveInformationUser }
 }
 
-export  {useGetInformationUser}
+export { useGetInformationUser }

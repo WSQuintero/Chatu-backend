@@ -21,7 +21,6 @@ function useUpdateExistMessages() {
           idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
         })) || []
 
-      console.log(actualMessages)
       actualMessages.forEach((mss) => {
         dispatch(updateMessages(mss))
       })

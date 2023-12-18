@@ -1,10 +1,10 @@
-import React from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 function Main({ children }) {
   const isUserAuthenticated = useSelector((state) => state.userAuthenticated)
   const navigate = useNavigate()
+  
   return (
     <>
       {isUserAuthenticated ? (

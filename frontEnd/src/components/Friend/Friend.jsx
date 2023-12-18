@@ -8,6 +8,9 @@ import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
 import { useDispatch } from 'react-redux'
 import { setUserFriends } from '../../redux/userFriendsInformationSlice'
 import { openModalChat } from '../../redux/openChatSlice'
+import { transformMessages } from '../../helpers/transformMessages'
+import { transformFriends } from '../../helpers/transformFriends'
+import { updatedInformation } from '../../helpers/updatedInformation'
 
 function Friend({ handleOpenFriendChat, friend }) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
@@ -24,55 +27,29 @@ function Friend({ handleOpenFriendChat, friend }) {
 
   const deleteFriend = (event) => {
     const friendToDelete = event.target.parentNode.parentNode.dataset.email
-    const actualMessages =
-      userFound?.messages?.arrayValue?.values?.map((mss) => {
-        return {
-          idConnection: mss.mapValue.fields.idConnection?.stringValue,
-          message: mss.mapValue.fields.message?.stringValue,
-          sender: mss.mapValue.fields.sender?.stringValue,
-          user: mss.mapValue.fields.user?.stringValue
-        }
-      }) || []
+    const actualMessages = transformMessages(userFound)
 
     const friends =
-      userFound?.friends?.arrayValue?.values
-        ?.map((fOf) => {
-          return {
-            email: fOf?.mapValue.fields.email?.stringValue,
-            name: fOf?.mapValue.fields.name?.stringValue,
-            uid: fOf?.mapValue.fields.uid?.stringValue,
-            perfilPhoto: fOf?.mapValue.fields.perfilPhoto?.stringValue
-          }
-        })
-        .filter((fr) => fr.email !== friendToDelete) || []
+      transformFriends(userFound).filter((fr) => fr.email !== friendToDelete) ||
+      []
 
-    const informationUserWithoutDeleteFriend = {
-      email: userFound?.email?.stringValue,
-      friends: friends,
-      idConnection: userFound?.idConnection?.stringValue,
-      messages: actualMessages,
-      name: userFound?.name?.stringValue,
-      uid: userFound?.uid?.stringValue,
-      perfilPhoto: userFound?.perfilPhoto?.stringValue
-    }
+    const keepInfo = updatedInformation({ userFound, friends, actualMessages })
 
     updateDocument({
       nameOfCollection: 'users',
       idDocument: idUserFound.id,
-      newInformation: informationUserWithoutDeleteFriend
+      newInformation: keepInfo
     })
 
     setUserSstorage({
-      ...informationUserWithoutDeleteFriend,
+      ...keepInfo,
       isUserAuthenticated: true,
       messages: []
     })
 
-    console.log(friends)
     dispatch(setUserFriends(friends))
     dispatch(openModalChat(false))
   }
-
 
   return (
     <article

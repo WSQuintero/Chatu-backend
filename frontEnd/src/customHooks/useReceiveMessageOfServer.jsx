@@ -6,24 +6,26 @@ import { useSearchUserByEmail } from './useSearchUserByEmail'
 import { useUpdateMessagesInFirestore } from './useUpdateMessagesInFirestore'
 import { useSearchIdByEmail } from './useSearchIdByEmail'
 import { useUpdateInformationUser } from './useUpdateInformationUser'
+import { transformMessages } from '../helpers/transformMessages'
+import { updatedInformation } from '../helpers/updatedInformation'
+import { transformFriends } from '../helpers/transformFriends'
 
 function useReceiveMessageOfServer() {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const friendInformation = useSelector((state) => state.friendInformation)
+  const emailFriend = friendInformation.friend.email.stringValue
   const messages = useSelector((state) => state.messages)
   const friendUid = friendInformation?.friend?.uid?.stringValue
   const idConnection = [friendUid, currentUser.uid].sort().join('')
-  const dispatch = useDispatch()
   const { findUser, userFound } = useSearchUserByEmail()
-  const { findUser: findFriendInformation, userFound: friendFound } =
-    useSearchUserByEmail()
   const { findUser: findIdUser, userFound: idUserFound } = useSearchIdByEmail()
-  const { findUser: findIdFriend, userFound: idFriendFound } =
-    useSearchIdByEmail()
   const { updateUserInDb } = useUpdateMessagesInFirestore()
-  const emailFriend = friendInformation.friend.email.stringValue
-  const { updateDocument, isOkayUpdate, setIsOkayUpdate } =
-    useUpdateInformationUser()
+  const { updateDocument } = useUpdateInformationUser()
+  const dispatch = useDispatch()
+  const { findUser: findFriendInformation, userFound: friendFound } =
+  useSearchUserByEmail()
+  const { findUser: findIdFriend, userFound: idFriendFound } =
+  useSearchIdByEmail()
 
   useEffect(() => {
     if (userFound && idUserFound) {
@@ -33,47 +35,26 @@ function useReceiveMessageOfServer() {
 
   useEffect(() => {
     if (friendFound && idFriendFound) {
-      if (messages.length === 0) return
-      const actualMessages =
-        friendFound?.messages?.arrayValue?.values?.map((mss) => {
-          return {
-            idConnection: mss.mapValue.fields.idConnection?.stringValue,
-            message: mss.mapValue.fields.message?.stringValue,
-            sender: mss.mapValue.fields.sender?.stringValue,
-            user: mss.mapValue.fields.user?.stringValue
-          }
-        }) || []
+      if (messages.length === 0) {
+        return
+      }
 
       const filterMessages =
-        actualMessages.filter((mss) => {
-          return mss?.idConnection !== idConnection
-        }) || []
+        transformMessages(friendFound).filter(
+          (mss) => mss?.idConnection !== idConnection
+        ) || []
 
       const filteruserMessages =
         messages.filter((mss) => mss.idConnection === idConnection) || []
 
-      const newMessagesFriend = {
-        email: friendFound?.email?.stringValue,
-        friends:
-          friendFound?.friends?.arrayValue?.values?.map((fOf) => {
-            return {
-              email: fOf?.mapValue.fields.email?.stringValue,
-              name: fOf?.mapValue.fields.name?.stringValue,
-              uid: fOf?.mapValue.fields.uid?.stringValue,
-              perfilPhoto: fOf?.mapValue.fields.perfilPhoto?.stringValue
-            }
-          }) || [],
-        idConnection: friendFound?.idConnection?.stringValue || '',
-        messages: [...filteruserMessages, ...filterMessages],
-        name: friendFound?.name?.stringValue,
-        uid: friendFound?.uid?.stringValue,
-        perfilPhoto: friendFound?.perfilPhoto?.stringValue
-      }
-
       updateDocument({
         nameOfCollection: 'users',
         idDocument: idFriendFound.id,
-        newInformation: newMessagesFriend
+        newInformation: updatedInformation({
+          userFound: friendFound,
+          friends: transformFriends(friendFound),
+          actualMessages: [...filteruserMessages, ...filterMessages]
+        })
       })
     }
   }, [friendFound, idFriendFound, messages])
@@ -81,7 +62,7 @@ function useReceiveMessageOfServer() {
   useEffect(() => {
     findUser(currentUser.email)
     findIdUser(currentUser.email)
-    findIdFriend(emailFriend) //creo que el problema está aquí
+    findIdFriend(emailFriend)
     findFriendInformation(emailFriend)
 
     const receiveMessage = (message) => {
