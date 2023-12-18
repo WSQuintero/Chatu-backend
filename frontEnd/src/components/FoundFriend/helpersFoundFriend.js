@@ -15,7 +15,8 @@ function updateFriendsOfUser({
       {
         name: userFound.name.stringValue,
         email: userFound.email.stringValue,
-        uid: userFound.uid.stringValue
+        uid: userFound.uid.stringValue,
+        perfilPhoto: userFound.perfilPhoto.stringValue
       }
     ]
 

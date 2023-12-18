@@ -41,7 +41,8 @@ function Friend({ handleOpenFriendChat, friend }) {
           return {
             email: fOf?.mapValue.fields.email?.stringValue,
             name: fOf?.mapValue.fields.name?.stringValue,
-            uid: fOf?.mapValue.fields.uid?.stringValue
+            uid: fOf?.mapValue.fields.uid?.stringValue,
+            perfilPhoto: fOf?.mapValue.fields.perfilPhoto?.stringValue
           }
         })
         .filter((fr) => fr.email !== friendToDelete) || []
@@ -52,7 +53,8 @@ function Friend({ handleOpenFriendChat, friend }) {
       idConnection: userFound?.idConnection?.stringValue,
       messages: actualMessages,
       name: userFound?.name?.stringValue,
-      uid: userFound?.uid?.stringValue
+      uid: userFound?.uid?.stringValue,
+      perfilPhoto: userFound?.perfilPhoto?.stringValue
     }
 
     updateDocument({
@@ -70,6 +72,8 @@ function Friend({ handleOpenFriendChat, friend }) {
     dispatch(setUserFriends(friends))
     dispatch(openModalChat(false))
   }
+
+  console.log(friend)
   return (
     <article
       key={friend.uid}
@@ -77,7 +81,7 @@ function Friend({ handleOpenFriendChat, friend }) {
       onClick={handleOpenFriendChat}
       data-email={friend.email}>
       <img
-        src={friend?.img || '/img/no-user.jpg'}
+        src={friend?.perfilPhoto || '/img/no-user.jpg'}
         alt='user image'
         className='h-[90%] object-cover rounded-full'
       />

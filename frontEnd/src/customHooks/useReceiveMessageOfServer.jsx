@@ -49,6 +49,7 @@ function useReceiveMessageOfServer() {
         }) || []
       const filteruserMessages =
         messages.filter((mss) => mss.idConnection === idConnection) || []
+        
       const newMessagesFriend = {
         email: friendFound?.email?.stringValue,
         friends:
@@ -56,13 +57,15 @@ function useReceiveMessageOfServer() {
             return {
               email: fOf?.mapValue.fields.email?.stringValue,
               name: fOf?.mapValue.fields.name?.stringValue,
-              uid: fOf?.mapValue.fields.uid?.stringValue
+              uid: fOf?.mapValue.fields.uid?.stringValue,
+              perfilPhoto: fOf?.mapValue.fields.perfilPhoto?.stringValue
             }
           }) || [],
         idConnection: friendFound?.idConnection?.stringValue,
         messages: [...filteruserMessages, ...filterMessages],
         name: friendFound?.name?.stringValue,
-        uid: friendFound?.uid?.stringValue
+        uid: friendFound?.uid?.stringValue,
+        perfilPhoto: friendFound?.perfilPhoto?.stringValue
       }
 
       updateDocument({

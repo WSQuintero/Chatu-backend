@@ -23,6 +23,7 @@ function AddedFriends({ inputSearch }) {
   useEffect(() => {
     console.log(userFriends)
   }, [userFriends])
+  
   const handleOpenFriendChat = (event) => {
     updateMessagesInDb(saveInformationUser)
     findFriend(event.target.dataset.email)

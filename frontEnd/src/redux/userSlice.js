@@ -5,7 +5,7 @@ const initialState = JSON.parse(sessionStorage.getItem('currentUser')) || {
   email: null,
   friends: [],
   uid: [],
-  idConnection:null
+  idConnection: null
 }
 
 const userSlice = createSlice({
@@ -13,13 +13,15 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     addUser: (state, action) => {
-      const { name, email, friends, uid, idConnection } = action.payload
+      const { name, email, friends, uid, idConnection, perfilPhoto } =
+        action.payload
 
       state.name = name
       state.email = email
       state.friends = friends
       state.uid = uid
       state.idConnection = idConnection
+      state.perfilPhoto = perfilPhoto
     }
   }
 })

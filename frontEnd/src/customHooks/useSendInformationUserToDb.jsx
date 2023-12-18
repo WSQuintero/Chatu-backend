@@ -15,7 +15,9 @@ function useSendInformationUserToDb({ userCredential, userInformation }) {
         uid: userCredential?.uid,
         friends: [],
         messages: [],
-        idConnection: []
+        idConnection: [],
+        perfilPhoto:
+          'https://www.selectenglish.co.uk/wp-content/uploads/2022/11/no-user-image.gif'
       })
     }
   }, [userCredential])

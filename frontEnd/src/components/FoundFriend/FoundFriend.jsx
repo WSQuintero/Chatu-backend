@@ -27,8 +27,8 @@ function FoundFriend({ userFound }) {
               <div className='flex gap-3'>
                 <img
                   src={
-                    userFound?.img?.stringValue
-                      ? userFound?.img?.stringValue
+                    userFound?.perfilPhoto?.stringValue
+                      ? userFound?.perfilPhoto?.stringValue
                       : '/img/no-user.jpg'
                   }
                   alt={userFound.name.stringValue}

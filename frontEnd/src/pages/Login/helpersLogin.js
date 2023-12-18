@@ -13,7 +13,8 @@ function updateActualUser({
         return {
           name: friend.mapValue.fields.name.stringValue,
           email: friend.mapValue.fields.email.stringValue,
-          uid: friend.mapValue.fields.uid.stringValue
+          uid: friend.mapValue.fields.uid.stringValue,
+          perfilPhoto: friend?.mapValue?.fields?.perfilPhoto?.stringValue || ''
         }
       }) || []
 
@@ -22,7 +23,8 @@ function updateActualUser({
       email: foundUser?.email.stringValue,
       uid: foundUser?.uid.stringValue,
       friends: friends,
-      isUserAuthenticated
+      isUserAuthenticated,
+      perfilPhoto: foundUser?.perfilPhoto?.stringValue || ''
     }
 
     setUserSstorage(updatedUser)

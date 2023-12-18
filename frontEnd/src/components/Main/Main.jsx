@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 function Main({ children }) {
-  const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const isUserAuthenticated = useSelector((state) => state.userAuthenticated)
   const navigate = useNavigate()
   return (

@@ -7,27 +7,76 @@ import { ModalSearchFriend } from '../../components/ModalSearchFriend/ModalSearc
 import { AddedFriends } from '../../components/AddedFriends/AddedFriends'
 import { FaCamera } from 'react-icons/fa'
 import { useUploadAndChargeImg } from '../../customHooks/useUploadAndChargeImg'
+import { useUpdateInformationUser } from '../../customHooks/useUpdateInformationUser'
+import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
+import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
 
 function ActiveChats() {
   const [openModalSearchFriends, setOpenModalSearchFriends] = useState(false)
+  const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const [inputSearch, setInputSearch] = useState('')
   const { uploadImg, imgUrl } = useUploadAndChargeImg()
+  const { updateDocument } = useUpdateInformationUser()
+  const { findUser, userFound } = useSearchIdByEmail()
+  const { findUser: findUserInformation, userFound: userInformation } =
+    useSearchUserByEmail()
 
+  console.log(currentUser)
   const handleSendImg = (event) => {
     uploadImg(event.target.files[0])
   }
+  useEffect(() => {
+    findUser(currentUser.email)
+    findUserInformation(currentUser.email)
+  }, [])
 
   useEffect(() => {
-    if (imgUrl) {
-      console.log(imgUrl)
+    if (userFound && userInformation) {
+      const actualMessages =
+        userInformation?.messages?.arrayValue?.values?.map((mss) => {
+          return {
+            idConnection: mss?.mapValue?.fields?.idConnection?.stringValue,
+            message: mss?.mapValue?.fields?.message?.stringValue,
+            sender: mss?.mapValue?.fields?.sender?.stringValue,
+            user: mss?.mapValue?.fields?.user?.stringValue
+          }
+        }) || []
+
+      const friends =
+        userInformation?.friends?.arrayValue?.values?.map((fOf) => {
+          return {
+            email: fOf?.mapValue?.fields?.email?.stringValue,
+            name: fOf?.mapValue?.fields?.name?.stringValue,
+            uid: fOf?.mapValue?.fields?.uid?.stringValue,
+            perfilPhoto: fOf?.mapValue?.fields?.perfilPhoto?.stringValue
+          }
+        }) || []
+
+      const informationUser = {
+        email: userInformation?.email?.stringValue,
+        friends: friends,
+        idConnection: userInformation?.idConnection?.stringValue || '',
+        messages: actualMessages,
+        name: userInformation?.name?.stringValue,
+        uid: userInformation?.uid?.stringValue,
+        perfilPhoto: imgUrl
+      }
+      if (imgUrl) {
+        updateDocument({
+          nameOfCollection: 'users',
+          idDocument: userFound.id,
+          newInformation: informationUser
+        })
+      }
     }
-  }, [imgUrl])
+  }, [imgUrl, userInformation, userFound])
+
   return (
     <Main>
       <figure className='w-[100px] h-[100px]  absolute top-1 bg-white rounded-full object-cover '>
         <div className='w-[100px] h-[100px]  overflow-hidden bg-white rounded-full object-cover'>
           <img
-            src={imgUrl || '/logo.png'}
+            src={imgUrl || userInformation?.perfilPhoto?.stringValue}
             alt='logo'
             className='object-cover w-full h-full'
           />
