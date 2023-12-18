@@ -1,7 +1,7 @@
 import { resetMessages, updateMessages } from '../redux/messageSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
-function useUpdateExistMessages( ) {
+function useUpdateExistMessages() {
   const messages = useSelector((state) => state.messages)
   const dispatch = useDispatch()
 
@@ -21,6 +21,7 @@ function useUpdateExistMessages( ) {
           idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
         })) || []
 
+      console.log(actualMessages)
       actualMessages.forEach((mss) => {
         dispatch(updateMessages(mss))
       })
@@ -30,4 +31,4 @@ function useUpdateExistMessages( ) {
   return { updateMessagesInDb }
 }
 
-export  {useUpdateExistMessages}
+export { useUpdateExistMessages }

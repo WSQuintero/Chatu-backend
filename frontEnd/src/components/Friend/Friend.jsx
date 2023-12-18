@@ -24,16 +24,15 @@ function Friend({ handleOpenFriendChat, friend }) {
 
   const deleteFriend = (event) => {
     const friendToDelete = event.target.parentNode.parentNode.dataset.email
-    const actualMessages = userFound?.messages?.arrayValue?.values
-      ? userFound?.messages?.arrayValue?.values.map((mss) => {
-          return {
-            idConnection: mss.mapValue.fields.idConnection?.stringValue,
-            message: mss.mapValue.fields.message?.stringValue,
-            sender: mss.mapValue.fields.sender?.stringValue,
-            user: mss.mapValue.fields.user?.stringValue
-          }
-        })
-      : []
+    const actualMessages =
+      userFound?.messages?.arrayValue?.values?.map((mss) => {
+        return {
+          idConnection: mss.mapValue.fields.idConnection?.stringValue,
+          message: mss.mapValue.fields.message?.stringValue,
+          sender: mss.mapValue.fields.sender?.stringValue,
+          user: mss.mapValue.fields.user?.stringValue
+        }
+      }) || []
 
     const friends =
       userFound?.friends?.arrayValue?.values
@@ -69,9 +68,11 @@ function Friend({ handleOpenFriendChat, friend }) {
       messages: []
     })
 
+    console.log(friends)
     dispatch(setUserFriends(friends))
     dispatch(openModalChat(false))
   }
+
 
   return (
     <article

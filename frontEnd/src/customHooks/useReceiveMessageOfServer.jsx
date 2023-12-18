@@ -24,6 +24,7 @@ function useReceiveMessageOfServer() {
   const emailFriend = friendInformation.friend.email.stringValue
   const { updateDocument, isOkayUpdate, setIsOkayUpdate } =
     useUpdateInformationUser()
+
   useEffect(() => {
     if (userFound && idUserFound) {
       updateUserInDb(userFound, idUserFound, messages)
@@ -32,24 +33,25 @@ function useReceiveMessageOfServer() {
 
   useEffect(() => {
     if (friendFound && idFriendFound) {
-      const actualMessages = friendFound?.messages?.arrayValue?.values
-        ? friendFound?.messages?.arrayValue?.values.map((mss) => {
-            return {
-              idConnection: mss.mapValue.fields.idConnection?.stringValue,
-              message: mss.mapValue.fields.message?.stringValue,
-              sender: mss.mapValue.fields.sender?.stringValue,
-              user: mss.mapValue.fields.user?.stringValue
-            }
-          })
-        : []
+      if (messages.length === 0) return
+      const actualMessages =
+        friendFound?.messages?.arrayValue?.values?.map((mss) => {
+          return {
+            idConnection: mss.mapValue.fields.idConnection?.stringValue,
+            message: mss.mapValue.fields.message?.stringValue,
+            sender: mss.mapValue.fields.sender?.stringValue,
+            user: mss.mapValue.fields.user?.stringValue
+          }
+        }) || []
 
       const filterMessages =
         actualMessages.filter((mss) => {
           return mss?.idConnection !== idConnection
         }) || []
+
       const filteruserMessages =
         messages.filter((mss) => mss.idConnection === idConnection) || []
-        
+
       const newMessagesFriend = {
         email: friendFound?.email?.stringValue,
         friends:
@@ -61,7 +63,7 @@ function useReceiveMessageOfServer() {
               perfilPhoto: fOf?.mapValue.fields.perfilPhoto?.stringValue
             }
           }) || [],
-        idConnection: friendFound?.idConnection?.stringValue,
+        idConnection: friendFound?.idConnection?.stringValue || '',
         messages: [...filteruserMessages, ...filterMessages],
         name: friendFound?.name?.stringValue,
         uid: friendFound?.uid?.stringValue,
@@ -73,7 +75,6 @@ function useReceiveMessageOfServer() {
         idDocument: idFriendFound.id,
         newInformation: newMessagesFriend
       })
-      // console.log(newMessagesFriend)
     }
   }, [friendFound, idFriendFound, messages])
 

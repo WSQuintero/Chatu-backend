@@ -12,7 +12,8 @@ function useUpdateMessagesInFirestore() {
           return {
             email: a.mapValue.fields.email.stringValue,
             name: a.mapValue.fields.name.stringValue,
-            uid: a.mapValue.fields.uid.stringValue
+            uid: a.mapValue.fields.uid.stringValue,
+            perfilPhoto: a.mapValue.fields.perfilPhoto.stringValue
           }
         }) || []
 
