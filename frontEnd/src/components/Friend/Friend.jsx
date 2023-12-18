@@ -87,14 +87,14 @@ function Friend({ handleOpenFriendChat, friend }) {
           {friend.message}
         </p>
       </div>
-      <div className='flex'>
+      <div className='flex items-center gap-3'>
         {openDeleteFriendModal && (
-          <button onClick={deleteFriend}>Eliminar</button>
+          <button onClick={deleteFriend} className='border p-1 border-green-500 hover:bg-red-500 hover:text-white rounded-md'>Eliminar</button>
         )}
         <IconContext.Provider
           value={{
             color: 'green',
-            size: '20px',
+            size: '25px',
             className: 'cursor-pointer'
           }}>
           <CiMenuKebab

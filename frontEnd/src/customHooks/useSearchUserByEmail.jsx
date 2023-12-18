@@ -26,7 +26,7 @@ function useSearchUserByEmail() {
       console.error('Error al obtener documentos de la colección:', error)
     }
   }
-  return { findUser, userFound }
+  return { findUser, userFound, setUserFound }
 }
 
 export { useSearchUserByEmail }
