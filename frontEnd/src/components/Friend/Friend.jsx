@@ -12,11 +12,11 @@ import { openModalChat } from '../../redux/openChatSlice'
 function Friend({ handleOpenFriendChat, friend }) {
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const [openDeleteFriendModal, setOpenDeleteFriendModal] = useState(false)
-  const { updateDocument, isOkayUpdate, setIsOkayUpdate } =
-    useUpdateInformationUser()
+  const { updateDocument, isOkayUpdate } = useUpdateInformationUser()
   const { findUser, userFound } = useSearchUserByEmail()
-  const { findUser:findIdUser, userFound:idUserFound } = useSearchIdByEmail()
-  const dispatch=useDispatch()
+  const { findUser: findIdUser, userFound: idUserFound } = useSearchIdByEmail()
+  const dispatch = useDispatch()
+
   useEffect(() => {
     findUser(currentUser.email)
     findIdUser(currentUser.email)
@@ -56,16 +56,16 @@ function Friend({ handleOpenFriendChat, friend }) {
     }
 
     updateDocument({
-      nameOfCollection:"users",
-      idDocument:idUserFound.id,
-      newInformation:informationUserWithoutDeleteFriend
+      nameOfCollection: 'users',
+      idDocument: idUserFound.id,
+      newInformation: informationUserWithoutDeleteFriend
     })
 
     setUserSstorage({
       ...informationUserWithoutDeleteFriend,
       isUserAuthenticated: true,
       messages: []
-    })   
+    })
 
     dispatch(setUserFriends(friends))
     dispatch(openModalChat(false))
@@ -89,7 +89,11 @@ function Friend({ handleOpenFriendChat, friend }) {
       </div>
       <div className='flex items-center gap-3'>
         {openDeleteFriendModal && (
-          <button onClick={deleteFriend} className='border p-1 border-green-500 hover:bg-red-500 hover:text-white rounded-md'>Eliminar</button>
+          <button
+            onClick={deleteFriend}
+            className='border p-1 border-green-500 hover:bg-red-500 hover:text-white rounded-md'>
+            Eliminar
+          </button>
         )}
         <IconContext.Provider
           value={{
