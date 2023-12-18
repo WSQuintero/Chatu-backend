@@ -7,7 +7,7 @@ function useSendInformationUserToDb({ userCredential, userInformation }) {
 
   const { sendInformationUser, errorInfoAdded, confirmationInfoAdded } =
     useAddUserInDb()
-    
+
   useEffect(() => {
     if (userCredential?.accessToken) {
       sendInformationUser({
@@ -24,7 +24,7 @@ function useSendInformationUserToDb({ userCredential, userInformation }) {
     if (confirmationInfoAdded) {
       navigate('/login')
     } else {
-      console.log(errorInfoAdded)
+      console.error(errorInfoAdded)
     }
   }, [confirmationInfoAdded, errorInfoAdded])
   return true

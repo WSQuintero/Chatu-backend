@@ -3,7 +3,8 @@ import userReducer from './userSlice'
 import openChatReducer from './openChatSlice'
 import friendInformationReducer from './friendInformationSlice'
 import messagesReducer from './messageSlice'
-import userAuthenticatedReducer from "./userAtuhenticated"
+import userAuthenticatedReducer from './userAtuhenticated'
+import userFriendsInformationSliceReducer from './userFriendsInformationSlice'
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     isOpenChat: openChatReducer,
     friendInformation: friendInformationReducer,
     messages: messagesReducer,
-    userAuthenticated: userAuthenticatedReducer
+    userAuthenticated: userAuthenticatedReducer,
+    userFriendsInformation: userFriendsInformationSliceReducer
   }
 })
 

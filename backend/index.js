@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
     // Mantener un seguimiento de las salas abiertas
     rooms[dataId.id] = true
 
-    console.log(`Usuario conectado a la sala ${dataId.sender}`)
+    console.log(`Usuario conectado a la sala ${socket.room}`)
     socket.emit('joinResponse', {
       success: true,
       message: 'Successfully joined the room'

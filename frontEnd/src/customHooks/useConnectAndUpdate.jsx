@@ -20,7 +20,7 @@ function useConnectAndUpdate(foundFriendInformation) {
     }
     socket.on('joinResponse', (response) => {
       if (response.success) {
-        console.log(`Usuario unido exitosamente a la sala: ${idConnection}`)
+        // console.log(`Usuario unido exitosamente a la sala: ${idConnection}`)
         if (window.innerWidth < 800) {
           navigate('/chat')
         } else {
