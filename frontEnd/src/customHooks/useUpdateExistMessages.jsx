@@ -1,3 +1,4 @@
+import { transformMessages } from '../helpers/transformMessages'
 import { resetMessages, updateMessages } from '../redux/messageSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -13,17 +14,10 @@ function useUpdateExistMessages() {
         dispatch(updateMessages(mss))
       })
     } else {
-      const actualMessages =
-        saveInformationUser?.messages?.arrayValue?.values?.map((a) => ({
-          message: a?.mapValue.fields.message.stringValue,
-          sender: a?.mapValue.fields.sender.stringValue,
-          user: a?.mapValue.fields.user.stringValue,
-          idConnection: a?.mapValue?.fields?.idConnection?.stringValue || ''
-        })) || []
-
-      actualMessages.forEach((mss) => {
-        dispatch(updateMessages(mss))
-      })
+      transformMessages(saveInformationUser) ||
+        []?.forEach((mss) => {
+          dispatch(updateMessages(mss))
+        })
     }
   }
 

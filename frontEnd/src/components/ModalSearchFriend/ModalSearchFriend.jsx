@@ -3,6 +3,8 @@ import { IoIosCloseCircle } from 'react-icons/io'
 import { IconContext } from 'react-icons/lib'
 import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
 import { FoundFriend } from '../FoundFriend/FoundFriend'
+import { useEffect } from 'react'
+import { useSearchIdByEmail } from '../../customHooks/useSearchIdByEmail'
 
 function ModalSearchFriend({
   openModalSearchFriends,
@@ -17,6 +19,8 @@ function ModalSearchFriend({
     setUserFound(undefined)
     findUser(searchUserByEmail)
   }
+
+
 
   return (
     <>

@@ -18,7 +18,7 @@ function Friend({ handleOpenFriendChat, friend }) {
     (state) => state.userFriendsInformation
   )
   const [openDeleteFriendModal, setOpenDeleteFriendModal] = useState(false)
-  const { updateDocument, isOkayUpdate } = useUpdateInformationUser()
+  const { updateDocument } = useUpdateInformationUser()
   const { findUser, userFound } = useSearchUserByEmail()
   const { findUser: findIdUser, userFound: idUserFound } = useSearchIdByEmail()
   const [friendToDelete, setFriendToDelete] = useState('')
@@ -64,9 +64,7 @@ function Friend({ handleOpenFriendChat, friend }) {
           isUserAuthenticated: true,
           messages: []
         })
-        console.log(friends)
-    dispatch(setUserFriends(friends))
-
+        dispatch(setUserFriends(friends))
       }
     }
   }, [userFound, idUserFound])

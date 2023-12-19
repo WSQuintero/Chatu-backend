@@ -1,13 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useUpdateInformationUser } from '../../customHooks/useUpdateInformationUser'
 import { useGetIdOfCollection } from '../../customHooks/useGetIdOfCollection'
 import { updateFriendsOfUser } from './helpersFoundFriend'
+import { useGetInformationUser } from '../../customHooks/useGetInformationUser'
+import { useGetIdUser } from '../../customHooks/useGetIdUser'
+import { transformMessages } from '../../helpers/transformMessages'
+import { transformFriends } from '../../helpers/transformFriends'
+import { updatedInformation } from '../../helpers/updatedInformation'
+import { setUserSstorage } from '../../helpers/setUserSstorage'
+import { useDispatch } from 'react-redux'
 
 function FoundFriend({ userFound }) {
   const { actualIdOfCollection } = useGetIdOfCollection()
   const { updateDocument, isOkayUpdate } = useUpdateInformationUser()
   const [friendExist, setFriendExist] = useState(false)
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
+  const { saveInformationUser } = useGetInformationUser()
+  const { savedIdUser } = useGetIdUser()
+  const dispatch = useDispatch()
 
   const handleAddListOfFriends = () => {
     updateFriendsOfUser({
@@ -17,6 +27,33 @@ function FoundFriend({ userFound }) {
       updateDocument
     })
   }
+
+  useEffect(() => {
+    if (savedIdUser && saveInformationUser) {
+      const actualMessages = transformMessages(userFound)
+
+      const friends = transformFriends(userFound)
+
+      const keepInfo = updatedInformation({
+        userFound,
+        friends,
+        actualMessages
+      })
+      if (friends) {
+        updateDocument({
+          nameOfCollection: 'users',
+          idDocument: savedIdUser.id,
+          newInformation: keepInfo
+        })
+
+        setUserSstorage({
+          ...keepInfo,
+          isUserAuthenticated: true,
+        })
+        dispatch(setUserFriends(friends))
+      }
+    }
+  }, [saveInformationUser, savedIdUser])
 
   return (
     <>

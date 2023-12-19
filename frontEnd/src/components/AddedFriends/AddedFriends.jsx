@@ -4,14 +4,14 @@ import { useSearchUserByInput } from '../../customHooks/useSearchUserByInput'
 import { useGetInformationUser } from '../../customHooks/useGetInformationUser'
 import { useUpdateExistMessages } from '../../customHooks/useUpdateExistMessages'
 import { Friend } from '../Friend/Friend'
-import { useSelector } from 'react-redux'
-import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { SelectFriendsUserInformation } from '../SelectFriendsUserInformation/SelectFriendsUserInformation'
-import { useSearchUserByEmail } from '../../customHooks/useSearchUserByEmail'
+import { setUserFriends } from '../../redux/userFriendsInformationSlice'
+import { transformFriends } from '../../helpers/transformFriends'
 
 function AddedFriends({ inputSearch }) {
   const userFriends = useSelector((state) => state.userFriendsInformation)
-  const messages = useSelector((state) => state.messages)
   const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
   const { findUser: findFriend, userFound: foundFriend } = useSearchIdByEmail()
   const { saveInformationUser } = useGetInformationUser(currentUser)
@@ -21,16 +21,21 @@ function AddedFriends({ inputSearch }) {
     currentUser
   )
   useConnectAndUpdate(foundFriend)
+  const [emailFriend, setEmailFriend] = useState('')
+  const dispatch = useDispatch()
 
-    const { findUser, userFound: userInformation } = useSearchUserByEmail()
+  useEffect(() => {
+    if (emailFriend) {
+      const friends = transformFriends(foundFriend)
+      findFriend(emailFriend)
+      dispatch(setUserFriends(friends))
+    }
+  }, [emailFriend])
 
-    useEffect(()=>{
-      
-    },[])
   const handleOpenFriendChat = (event) => {
     updateMessagesInDb(saveInformationUser)
-    console.log(saveInformationUser)
     findFriend(event.target.dataset.email)
+    setEmailFriend(event.target.dataset.email)
   }
 
   return (
