@@ -20,8 +20,13 @@ const io = new SocketServer(server, {
   },
 })
 
-app.use(cors())
-// Objeto para mantener un seguimiento de las salas abiertas
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Reemplaza con tu origen específico
+    methods: ['GET', 'POST'],
+    credentials: true,
+  })
+);// Objeto para mantener un seguimiento de las salas abiertas
 const rooms = {}
 
 io.on('connection', (socket) => {
