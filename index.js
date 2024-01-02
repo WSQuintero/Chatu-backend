@@ -59,8 +59,10 @@ io.on('connection', (socket) => {
 
   socket.on('message', (data) => {
     io.to(socket.room).emit('message', {
-      message: data,
-      sender: socket.sender,
+      message: data.message,
+      sender: data.sender,
+      idConnection: data.idConnection,
+      receiver: data.receiver,
     })
   })
 })
