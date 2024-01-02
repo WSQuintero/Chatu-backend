@@ -7,11 +7,11 @@ const app = express()
 const server = http.createServer(app)
 const io = new SocketServer(server, {
   cors: {
-    origin: 'https://chatu-two.vercel.app/',
+    origin: 'http://localhost:5173',
     credentials: true,
     cors: {
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Origin': 'https://chatu-two.vercel.app/',
+      'Access-Control-Allow-Origin': 'http://localhost:5173',
       'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
     },
   },
@@ -19,7 +19,7 @@ const io = new SocketServer(server, {
 
 app.use(
   cors({
-    origin: 'https://chatu-two.vercel.app//', // Reemplaza con tu origen específico
+    origin: 'http://localhost:5173', // Reemplaza con tu origen específico
     methods: ['GET', 'POST'],
     credentials: true,
   }),
