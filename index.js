@@ -7,11 +7,11 @@ const app = express()
 const server = http.createServer(app)
 const io = new SocketServer(server, {
   cors: {
-    origin: 'https://chatu-front.vercel.app',
+    origin: 'https://chatu-two.vercel.app/',
     credentials: true,
     cors: {
       'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Origin': 'https://chatu-front.vercel.app',
+      'Access-Control-Allow-Origin': 'https://chatu-two.vercel.app/',
       'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
     },
   },
@@ -19,11 +19,11 @@ const io = new SocketServer(server, {
 
 app.use(
   cors({
-    origin: 'https://chatu-front.vercel.app/', // Reemplaza con tu origen específico
+    origin: 'https://chatu-two.vercel.app//', // Reemplaza con tu origen específico
     methods: ['GET', 'POST'],
     credentials: true,
   }),
-)// Objeto para mantener un seguimiento de las salas abiertas
+) // Objeto para mantener un seguimiento de las salas abiertas
 const rooms = {}
 
 io.on('connection', (socket) => {
